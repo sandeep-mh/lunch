@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lunch Spots near Mediahub</title>
     
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Leaflet CSS & JS for the map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
@@ -69,10 +67,8 @@
 </head>
 <body class="flex flex-col-reverse md:flex-row h-screen bg-gray-50">
 
-    <!-- Sidebar Wrapper -->
     <div class="w-full md:w-[450px] bg-white shadow-xl flex flex-col h-[55%] md:h-full z-10 overflow-hidden">
         
-        <!-- App Title Header -->
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
             <div>
                 <h1 class="text-xl font-extrabold text-[#000749] flex items-center gap-1 tracking-tight">
@@ -85,7 +81,6 @@
             </span>
         </div>
 
-        <!-- Filter Bar with 🐝 Buzz Offers and Shops -->
         <div class="p-4 bg-gray-50 border-b border-gray-100 shrink-0">
             <div class="bg-gray-200/60 p-1 rounded-lg grid grid-cols-3 gap-1">
                 <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-xs font-bold rounded bg-white text-gray-800 shadow-sm transition-all text-center">All</button>
@@ -97,33 +92,28 @@
             </div>
             <div class="flex justify-between items-center mt-3 px-1">
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Verified Neighborhood Spots</p>
-                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">22</span> / 22 spots</span>
+                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">42</span> / 42 spots</span>
             </div>
         </div>
         
-        <!-- Directory List Panel -->
         <div class="overflow-y-auto flex-1 p-4 space-y-3 bg-white">
             <div id="location-list" class="space-y-3">
-                <!-- JavaScript will populate this list -->
-            </div>
+                </div>
         </div>
 
-        <!-- Sticky Safety Disclaimer Footer (Now pinned strictly to the bottom) -->
         <div class="p-4 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 leading-normal shrink-0 select-none">
             <div class="flex items-start gap-2">
                 <span class="text-xs mt-0.5">💡</span>
                 <p>
-                    <strong>OMG Bankside 3 Guide:</strong> This map directory contains local dining spots. Please double-check menu details, hours, and active Better Bankside Buzz Card discounts directly with the venues before visiting.
+                    <strong>OMG Bankside 3 Guide:</strong> This map directory contains local dining spots. Please double-check menu details, hours, and active <a href="https://betterbankside.co.uk/offers/category/dining-and-drinking" target="_blank" class="text-[#5877e9] hover:underline font-bold">Better Bankside Buzz Card</a> discounts directly with the venues before visiting.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- Map Container -->
     <div class="flex-1 h-[45%] md:h-full relative">
         <div id="map"></div>
         
-        <!-- Legend Overlay inside Map -->
         <div class="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-lg rounded-xl p-3.5 z-[1000] border border-gray-100 max-w-[200px] pointer-events-auto">
             <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
                 <h4 class="text-xs font-bold text-gray-800 flex items-center gap-1">
@@ -168,8 +158,7 @@
     </div>
 
     <script>
-        // Leaflet / Map Initialization & Predefined Locations (22 Curated Audited Spots + Office)
-        // Meticulously updated, real-world lat/lng coordinates and web addresses from your local CSV audits
+        // Leaflet / Map Initialization & Predefined Locations (42 Curated Audited Spots + Office)
         const locations = [
             {
                 id: 'mediahub',
@@ -411,6 +400,206 @@
                 time: '5 mins',
                 buzzOffer: '10% off food and drink (Tue 12-6pm, Wed/Thu 12-4pm). Code: BUZZ10',
                 url: 'https://www.flatironsquare.co.uk/'
+            },
+            {
+                id: 'boroughmarket',
+                name: 'Borough Market',
+                category: 'market',
+                lat: 51.505444,
+                lng: -0.091249,
+                desc: 'Famous historic food market offering an incredible range of artisanal street foods, fresh British produce, and international delicacies.',
+                time: '7 mins',
+                url: 'https://boroughmarket.org.uk/'
+            },
+            {
+                id: 'breakfastclub',
+                name: 'The Breakfast Club London Bridge',
+                category: 'sitdown',
+                lat: 51.504607,
+                lng: -0.091346,
+                desc: 'Brunch / All-day breakfast spot located at 11 Southwark St, SE1 1RQ. Known for its quirky style and huge stack pancakes.',
+                time: '7 mins',
+                url: 'https://thebreakfastclubcafes.com/london-bridge/'
+            },
+            {
+                id: 'pyro',
+                name: 'Pyro',
+                category: 'sitdown',
+                lat: 51.504650,
+                lng: -0.094804,
+                desc: 'Modern European / Grill restaurant serving premium dishes at 53b Southwark St, SE1 1RU.',
+                time: '4 mins',
+                url: 'https://www.google.com/maps/search/Pyro+Southwark+Street+London'
+            },
+            {
+                id: 'bistromirlot',
+                name: 'Bistro Mirlot',
+                category: 'sitdown',
+                lat: 51.505379,
+                lng: -0.099258,
+                desc: 'Classic, delicious French bistro cuisine located at 71-79 Southwark St, SE1 0JA.',
+                time: '1 min',
+                url: 'https://www.google.com/maps/search/Bistro+Mirlot+Southwark+Street+London'
+            },
+            {
+                id: 'overborough',
+                name: "'O Ver Borough",
+                category: 'sitdown',
+                lat: 51.504889,
+                lng: -0.093966,
+                desc: 'Authentic Neapolitan pizza / Italian spot located at 44-46 Southwark St, SE1 1UN. Famous for pure sea water dough pizzas.',
+                time: '4 mins',
+                url: 'https://www.overuk.com/'
+            },
+            {
+                id: 'casadofrango',
+                name: 'Casa do Frango',
+                category: 'sitdown',
+                lat: 51.504892,
+                lng: -0.092748,
+                desc: 'Outstanding Algarvian piri-piri Portuguese chicken restaurant located at 32 Southwark St, SE1 1TU.',
+                time: '5 mins',
+                url: 'https://www.casadofrango.co.uk/locations/london-bridge/'
+            },
+            {
+                id: 'silkaborough',
+                name: 'Silka Borough Market',
+                category: 'sitdown',
+                lat: 51.505077,
+                lng: -0.090070,
+                desc: 'Aromatic, premium Indian regional curries and tandoori located at 6 Southwark St, SE1 1TQ.',
+                time: '8 mins',
+                url: 'https://www.silkaboroughmarket.co.uk/'
+            },
+            {
+                id: 'banksidecafe',
+                name: 'The Bankside Cafe',
+                category: 'quick',
+                lat: 51.503880,
+                lng: -0.106709,
+                desc: 'Traditional English cafe serving legendary breakfasts and hot lunch rolls at 2-3 Hatfields, SE1 8DQ.',
+                time: '7 mins',
+                url: 'https://www.google.com/maps/search/The+Bankside+Cafe+Hatfields+London'
+            },
+            {
+                id: 'nagare',
+                name: 'Nagare Bankside',
+                category: 'quick',
+                lat: 51.507067,
+                lng: -0.097271,
+                desc: 'Exquisite Japanese bakery / cafe serving artisan drinks and sweet pastries at 2 Triptych Pl, SE1 9RD.',
+                time: '3 mins',
+                url: 'https://www.nagare.co.uk/'
+            },
+            {
+                id: 'chealsons',
+                name: 'Chealsons Coffee Bankside',
+                category: 'quick',
+                lat: 51.508530,
+                lng: -0.100048,
+                desc: 'Independent specialty coffee / light bites located on the scenic Bankside walk, SE1 9JH.',
+                time: '4 mins',
+                url: 'https://chealsonscoffee.co.uk/'
+            },
+            {
+                id: 'foundersarms',
+                name: "Founder's Arms",
+                category: 'sitdown',
+                lat: 51.508519,
+                lng: -0.101583,
+                desc: 'Classic pub / British dishes with panoramic Thames-side views located at 52 Hopton St, SE1 9JH.',
+                time: '5 mins',
+                url: 'https://www.foundersarms.co.uk/'
+            },
+            {
+                id: 'sonoodle',
+                name: 'So Noodle',
+                category: 'quick',
+                lat: 51.506387,
+                lng: -0.101894,
+                desc: 'Cozy and fast Chinese noodle bar located at 134 Southwark St, SE1 0SW.',
+                time: '3 mins',
+                url: 'https://www.google.com/maps/search/So+Noodle+Southwark+Street+London'
+            },
+            {
+                id: 'dandan',
+                name: 'DanDan London Bridge',
+                category: 'quick',
+                lat: 51.504850,
+                lng: -0.093090,
+                desc: 'Outstanding Chinese / Hand-pulled wheat noodle bar located at 34-36 Southwark St, SE1 1UN.',
+                time: '5 mins',
+                url: 'https://www.google.com/maps/search/DanDan+Southwark+Street+London'
+            },
+            {
+                id: 'yunguichuan',
+                name: 'Yun Gui Chuan Rice Noodle',
+                category: 'quick',
+                lat: 51.505135,
+                lng: -0.101409,
+                desc: 'Hearty Chinese rice noodle dishes located at 18 Great Suffolk St, SE1 0UG.',
+                time: '2 mins',
+                url: 'https://www.google.com/maps/search/Yun+Gui+Chuan+Rice+Noodle+Great+Suffolk+Street+London'
+            },
+            {
+                id: 'ricecoming',
+                name: 'Rice Coming Noodle Bar',
+                category: 'quick',
+                lat: 51.500923,
+                lng: -0.094023,
+                desc: 'Authentic Chinese / Hunan-style spicy noodle bowls located at 218 Borough High St, SE1 1JX.',
+                time: '8 mins',
+                url: 'https://www.google.com/maps/search/Rice+Coming+Noodle+Bar+Borough+High+Street+London'
+            },
+            {
+                id: 'xianbiangbiang',
+                name: "Xi'an BiangBiang Noodles",
+                category: 'quick',
+                lat: 51.505533,
+                lng: -0.087849,
+                desc: "Famous Chinese Xi'an wide hand-pulled noodles located at 35 Railway Approach, SE1 9SS.",
+                time: '10 mins',
+                url: 'https://xianbiangbiangnoodles.com/'
+            },
+            {
+                id: 'nomarestaurant',
+                name: 'Noma Restaurant',
+                category: 'sitdown',
+                lat: 51.503003,
+                lng: -0.108054,
+                desc: 'Creative Japanese / fusion restaurant located along the vibrant Southwark area at 84 The Cut, SE1 8LW.',
+                time: '9 mins',
+                url: 'https://www.google.com/maps/search/Noma+Restaurant+The+Cut+London'
+            },
+            {
+                id: 'pizzaexpress',
+                name: 'PizzaExpress Bankside',
+                category: 'sitdown',
+                lat: 51.508191,
+                lng: -0.095837,
+                desc: 'Reliable hand-tossed Neapolitan style pizza / Italian dining located at 24 New Globe Walk, SE1 9DS.',
+                time: '4 mins',
+                url: 'https://www.pizzaexpress.com/bankside'
+            },
+            {
+                id: 'zizzibankside',
+                name: 'Zizzi Bankside',
+                category: 'sitdown',
+                lat: 51.508042,
+                lng: -0.094920,
+                desc: 'Relaxed Italian restaurant chain serving pasta, pizza, and desserts at Riverside House, Southwark Bridge Rd, SE1 9HA.',
+                time: '5 mins',
+                url: 'https://www.zizzi.co.uk/italian/restaurants/bankside'
+            },
+            {
+                id: 'gailsneobankside',
+                name: "GAIL's Bakery Neo Bankside",
+                category: 'quick',
+                lat: 51.506788,
+                lng: -0.100623,
+                desc: 'Artisanal bakery and specialty coffee spot serving legendary sourdough bread, sweet morning pastries, and fresh lunch rolls. Located at Unit C, 70 Holland St, London SE1 9NX.',
+                time: '2 mins',
+                url: 'https://gailsbread.co.uk/'
             }
         ];
 
@@ -432,7 +621,7 @@
         }).addTo(map);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 20
         }).addTo(map);
@@ -518,10 +707,10 @@
                     `;
                 }
 
-                // Add action links for the list item (updated origin to use "90, 100 Southwark St, London SE1 0SW")
+                // Add action links for the list item (updated origin to full query)
                 let listLinksHtml = '';
                 if (loc.category !== 'office') {
-                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
+                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
                     listLinksHtml = `
                         <div class="mt-3 flex gap-2" onclick="event.stopPropagation();">
                             ${loc.url ? `<a href="${loc.url}" target="_blank" class="flex-grow text-center bg-[#5877e9]/10 hover:bg-[#5877e9] text-[#5877e9] hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#5877e9]/20">🌐 Website</a>` : ''}
@@ -598,10 +787,10 @@
                 `;
             }
 
-            // Build links for Website and Google Maps walking directions inside popups (updated origin to use "90, 100 Southwark St, London SE1 0SW")
+            // Build links for Website and Google Maps walking directions inside popups
             let popupLinksHtml = '';
             if (loc.category !== 'office') {
-                const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
+                const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
                 popupLinksHtml = `
                     <div class="flex gap-2 border-t border-gray-100 pt-2.5 mt-2.5">
                         ${loc.url ? `<a href="${loc.url}" target="_blank" style="color: #ffffff !important;" class="flex-grow text-center bg-[#5877e9] hover:bg-[#4663cf] text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all border border-[#5877e9]/20 block">🌐 Website</a>` : ''}
