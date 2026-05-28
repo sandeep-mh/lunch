@@ -38,6 +38,15 @@
             color: #374151;
         }
 
+        /* Force popup buttons to maintain crisp white text, overriding Leaflet's high-specificity default link blue */
+        .custom-popup a, 
+        .custom-popup a:hover, 
+        .custom-popup a:active, 
+        .custom-popup a:visited {
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+
         .header-office { background-color: #000749; }
         .header-quick { background-color: #10B981; }
         .header-sitdown { background-color: #F59E0B; }
@@ -58,10 +67,10 @@
         ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
     </style>
 </head>
-<body class="flex flex-col md:flex-row h-screen bg-gray-50">
+<body class="flex flex-col-reverse md:flex-row h-screen bg-gray-50">
 
     <!-- Sidebar Wrapper -->
-    <div class="w-full md:w-[450px] bg-white shadow-xl flex flex-col h-2/5 md:h-full z-10 overflow-hidden">
+    <div class="w-full md:w-[450px] bg-white shadow-xl flex flex-col h-[55%] md:h-full z-10 overflow-hidden">
         
         <!-- App Title Header -->
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
@@ -88,7 +97,7 @@
             </div>
             <div class="flex justify-between items-center mt-3 px-1">
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Verified Neighborhood Spots</p>
-                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">47</span> / 47 spots</span>
+                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">22</span> / 22 spots</span>
             </div>
         </div>
         
@@ -99,7 +108,7 @@
             </div>
         </div>
 
-        <!-- Sticky Safety Disclaimer Footer -->
+        <!-- Sticky Safety Disclaimer Footer (Now pinned strictly to the bottom) -->
         <div class="p-4 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 leading-normal shrink-0 select-none">
             <div class="flex items-start gap-2">
                 <span class="text-xs mt-0.5">💡</span>
@@ -111,7 +120,7 @@
     </div>
 
     <!-- Map Container -->
-    <div class="flex-1 h-3/5 md:h-full relative">
+    <div class="flex-1 h-[45%] md:h-full relative">
         <div id="map"></div>
         
         <!-- Legend Overlay inside Map -->
@@ -159,46 +168,50 @@
     </div>
 
     <script>
-        // Leaflet / Map Initialization & Predefined Locations (47 Curated Spots + Office)
-        // Meticulously audited, real-world lat/lng coordinates in London SE1 from local CSV audits
+        // Leaflet / Map Initialization & Predefined Locations (22 Curated Audited Spots + Office)
+        // Meticulously updated, real-world lat/lng coordinates and web addresses from your local CSV audits
         const locations = [
             {
                 id: 'mediahub',
                 name: 'Your Office (Bankside 3)',
                 category: 'office',
-                lat: 51.50582,
-                lng: -0.09955,
-                desc: 'Mediahub / Omnicom Media Group offices.',
-                time: '0 min'
+                lat: 51.505615,
+                lng: -0.098869,
+                desc: 'OMG / Mediahub offices, located at 90, 100 Southwark St, London SE1 0SW.',
+                time: '0 min',
+                url: 'https://omnicommedia.com/'
             },
             {
                 id: 'refinery',
-                name: 'The Refinery Bankside',
+                name: 'The Refinery',
                 category: 'sitdown',
-                lat: 51.505600,
-                lng: -0.101100,
-                desc: 'Located right next door in the Blue Fin Building. Perfect for team lunches, quick drinks, or casual business chats.',
+                lat: 51.506100,
+                lng: -0.099550,
+                desc: 'Located right next to the office in the Blue Fin Building. Perfect for team lunches, quick drinks, or casual business chats.',
                 time: '1 min',
-                buzzOffer: '15% off food & drinks (Fri-Tue)'
+                buzzOffer: '15% off food & drinks (Fri-Tue)',
+                url: 'https://www.drakeandmorgan.co.uk/the-refinery-bankside/'
             },
             {
                 id: 'leonsouthwark',
-                name: 'LEON Southwark Street',
+                name: 'LEON Borough Market',
                 category: 'quick',
-                lat: 51.505500,
-                lng: -0.101300,
-                desc: 'Located practically next door on the ground level of the Blue Fin complex. Excellent healthy fast food box-meals, wraps, and specialty baked fries.',
-                time: '2 mins',
-                buzzOffer: '15% discount on food (excludes delivery platforms)'
+                lat: 51.505215,
+                lng: -0.089776,
+                desc: 'Excellent healthy fast food box-meals, wraps, and specialty baked fries, located at Borough Market.',
+                time: '8 mins',
+                buzzOffer: '15% discount on food (excludes delivery platforms)',
+                url: 'https://leon.co/restaurants/borough/'
             },
             {
                 id: 'blacksheep',
-                name: 'Black Sheep Coffee Southwark',
+                name: 'Black Sheep Coffee',
                 category: 'quick',
-                lat: 51.505600,
-                lng: -0.098000,
-                desc: 'Super quick specialty coffee house, signature waffles, and premium toasted sandwiches directly across Southwark Street.',
-                time: '1 min'
+                lat: 51.505410,
+                lng: -0.099509,
+                desc: 'Specialty coffee, signature waffles, and premium toasted sandwiches located right next to the office.',
+                time: '1 min',
+                url: 'https://blacksheepcoffee.co.uk/'
             },
             {
                 id: 'tablecafe',
@@ -206,423 +219,198 @@
                 category: 'sitdown',
                 lat: 51.505484,
                 lng: -0.099817,
-                desc: 'Award-winning brunch and lunch spot on the south side of Southwark Street. Fantastic quality and sustainable sourcing.',
-                time: '2 mins'
+                desc: 'Award-winning brunch and lunch spot on Southwark Street. Fantastic quality and sustainable sourcing.',
+                time: '1 min',
+                url: 'https://thetablecafe.com/'
             },
             {
                 id: 'philpotts',
-                name: 'Philpotts Southwark Street',
+                name: 'Philpotts',
                 category: 'quick',
-                lat: 51.505300,
-                lng: -0.096800,
-                desc: 'The corporate office champion for bespoke freshly-crafted baguettes, specialty deli sandwiches, and customized green salad boxes.',
-                time: '3 mins'
+                lat: 51.506496,
+                lng: -0.102303,
+                desc: 'Quality custom-built baguettes, salads, and wraps. Located at Bankside Sandwich Bar (142A Southwark St).',
+                time: '3 mins',
+                url: 'https://www.philpotts.co.uk/'
             },
             {
                 id: 'olivesandoregano',
-                name: 'Olives & Oregano (Southwark St)',
+                name: 'Olives and Oregano',
                 category: 'quick',
-                lat: 51.505100,
-                lng: -0.095500,
-                desc: 'Bustling Greek street-food counter down Southwark Street. Serving delicious, hand-rolled souvlaki, gyro wraps, and fresh oregano fries.',
-                time: '2 mins'
+                lat: 51.501608,
+                lng: -0.092377,
+                desc: 'Delicious Greek souvlaki, gyro wraps, and fresh oregano fries. Located as The Authentic Souvlaki on Tabard St.',
+                time: '10 mins',
+                url: 'https://www.google.com/maps/search/Olives+%26+Oregano+Southwark+Street+London'
             },
             {
                 id: 'gofalafel',
-                name: 'Go Falafel Southwark',
+                name: 'Go Falafel',
                 category: 'quick',
-                lat: 51.504800,
-                lng: -0.098800,
-                desc: 'Fantastic 100% vegan fast-grab counter at the corner of Blue Fin. Incredible fresh chickpea falafel wraps filled with house hummus and pickles.',
-                time: '2 mins'
-            },
-            {
-                id: 'banhmisaigon',
-                name: 'Banh Mi Sai Gon',
-                category: 'quick',
-                lat: 51.504850,
-                lng: -0.098480,
-                desc: 'Outstanding authentic Vietnamese baguettes at 23a Great Guildford St. Incredible crispy pork belly, lemongrass chicken, or tofu banh mi prepared fresh to order.',
-                time: '3 mins'
+                lat: 51.506359,
+                lng: -0.101869,
+                desc: 'Fresh chickpea falafel wraps filled with house hummus, pickled cabbage, and tahini. (Matches All That Falafel & More at 132 Southwark St).',
+                time: '3 mins',
+                url: 'https://gofalafel.co.uk/'
             },
             {
                 id: 'honipoke',
-                name: 'Honi Poke Bankside',
+                name: 'Honi Poke',
                 category: 'quick',
-                lat: 51.506500,
-                lng: -0.100100,
-                desc: 'Incredible fresh, customizable poke bowls. Superb healthy grab-and-go option on Canvey Street.',
-                time: '1 min',
-                buzzOffer: '15% off on your orders. Code: 15offBUZZ'
+                lat: 51.505566,
+                lng: -0.098718,
+                desc: 'Fresh, customizable Hawaiian poke bowls on Southwark Street.',
+                time: '2 mins',
+                buzzOffer: '15% off on your orders. Code: 15offBUZZ',
+                url: 'https://www.honipoke.com/'
             },
             {
                 id: 'itsulondonbridge',
-                name: 'ITSU London Bridge (The Shard)',
+                name: 'ITSU Southwark',
                 category: 'quick',
-                lat: 51.505350,
-                lng: -0.089850,
-                desc: 'Nutritious Asian-inspired fast lunch located right next to Borough High St / London Bridge station junction, under The Shard.',
-                time: '8 mins',
-                buzzOffer: '10% off food (select local staff discount on kiosk)'
+                lat: 51.505013,
+                lng: -0.097177,
+                desc: 'Nutritious Asian-inspired fast lunch on Southwark Street. Freshly made sushi, steamed bao, gyoza, and warm noodle bowls.',
+                time: '3 mins',
+                buzzOffer: '10% off food (select local staff discount on kiosk)',
+                url: 'https://www.itsu.com/'
             },
             {
                 id: 'msfood',
-                name: 'M&S Simply Food (Bankside)',
+                name: 'M&S Simply Food',
                 category: 'shop',
-                lat: 51.505800,
-                lng: -0.099700,
-                desc: 'Outstanding gourmet supermarket located at Unit 21, 90 Southwark St, London SE1 0HX. The go-to for quality meal deals and premium snacks directly downstairs.',
-                time: '1 min'
+                lat: 51.505557,
+                lng: -0.098044,
+                desc: 'Outstanding gourmet supermarket located on Southwark Street. Excellent for quality meal deals and premium office snacks.',
+                time: '2 mins',
+                url: 'https://www.marksandspencer.com/'
             },
             {
                 id: 'sainsburyssouthwark',
                 name: "Sainsbury's Local (Southwark St)",
                 category: 'shop',
-                lat: 51.505300,
-                lng: -0.102200,
-                desc: 'Supermarket right across Great Suffolk Street. Extremely fast and well-stocked for classic lunchtime meal deals.',
-                time: '2 mins'
+                lat: 51.505220,
+                lng: -0.101423,
+                desc: 'Extremely convenient supermarket located on Great Suffolk St. Reliable selection of lunch meal deals and cold drinks.',
+                time: '2 mins',
+                url: 'https://www.sainsburys.co.uk/'
             },
             {
                 id: 'tescosouthwark',
-                name: 'Tesco Express (Southwark St)',
+                name: 'Tesco Express',
                 category: 'shop',
-                lat: 51.505250,
-                lng: -0.103250,
-                desc: 'Convenient grocery express store located just down Southwark Street past Great Suffolk Street. Reliable range of quick salads and wraps.',
-                time: '3 mins'
+                lat: 51.504988,
+                lng: -0.101197,
+                desc: 'Convenient grocery express store located on Great Suffolk St. Reliable range of quick salads, meal deals, and snacks.',
+                time: '3 mins',
+                url: 'https://www.tesco.com/'
             },
             {
                 id: 'coopgreatsuffolk',
-                name: 'Co-op Food (Great Suffolk St)',
+                name: 'Co-op Food',
                 category: 'shop',
-                lat: 51.503450,
-                lng: -0.100150,
-                desc: 'Spacious food store positioned just south of Southwark Street. Excellent bakery section for warm pastry items and quick lunchtime salads.',
-                time: '3 mins'
+                lat: 51.506319,
+                lng: -0.100948,
+                desc: 'Spacious food store positioned on Sumner St. Excellent bakery section for warm pastry items and quick salads.',
+                time: '2 mins',
+                url: 'https://www.coop.co.uk/'
             },
             {
                 id: 'sainsburysborough',
                 name: "Sainsbury's Local (Borough High St)",
                 category: 'shop',
-                lat: 51.504150,
-                lng: -0.090350,
-                desc: 'A large local supermarket right next to Borough High Street tube exit. Handy for grabbing high-quality drinks and quick cold bites.',
-                time: '8 mins'
+                lat: 51.502863,
+                lng: -0.092258,
+                desc: 'A large local supermarket next to Borough High Street tube exit. Handy for grabbing high-quality drinks and quick cold bites.',
+                time: '9 mins',
+                url: 'https://www.sainsburys.co.uk/'
             },
             {
                 id: 'capricci',
-                name: 'Capricci (NEO Bankside)',
+                name: 'Capricci NEO Bankside',
                 category: 'sitdown',
-                lat: 51.507050,
-                lng: -0.100350,
-                desc: 'Charming authentic Italian trattoria offering delicious artisanal pastas and a stellar wine list behind Tate Modern on Canvey Street.',
+                lat: 51.506565,
+                lng: -0.100575,
+                desc: 'Charming authentic Italian trattoria offering delicious artisanal pastas and a stellar wine list behind Tate Modern.',
                 time: '2 mins',
-                buzzOffer: '15% off your meal and wine'
+                buzzOffer: '15% off your meal and wine',
+                url: 'http://www.capricci.co.uk/'
             },
             {
                 id: 'tate',
-                name: 'Tate Modern (The Corner)',
+                name: 'Tate Modern Restaurant',
                 category: 'quick',
-                lat: 51.507450,
-                lng: -0.099400,
-                desc: 'Beautiful riverside hangout inside Tate Modern ground floor. Great coffee, light bites, and craft beers.',
+                lat: 51.507692,
+                lng: -0.098548,
+                desc: 'Vibrant riverside gallery eatery inside Tate Modern. Great coffee, light bites, and craft beers with stunning views.',
                 time: '2 mins',
-                buzzOffer: '20% off after 5pm'
+                buzzOffer: '20% off after 5pm',
+                url: 'https://www.tate.org.uk/visit/tate-modern/corner'
             },
             {
                 id: 'caravan',
                 name: 'Caravan Bankside',
                 category: 'sitdown',
-                lat: 51.504180,
-                lng: -0.100900,
-                desc: 'Stunning industrial-chic warehouse cafe on Great Suffolk Street. Globally-inspired small plates and legendary specialty coffee.',
+                lat: 51.504561,
+                lng: -0.097025,
+                desc: 'Stunning industrial-chic warehouse cafe. Globally-inspired small plates and legendary specialty coffee.',
                 time: '3 mins',
-                buzzOffer: '15% off your bill (Mon-Fri, up to 8 guests)'
+                buzzOffer: '15% off your bill (Mon-Fri, up to 8 guests)',
+                url: 'https://caravangroup.co.uk/pages/bankside'
             },
             {
                 id: 'gentlemenbaristas',
-                name: 'The Gentlemen Baristas (Union Street)',
+                name: 'The Gentlemen Baristas',
                 category: 'quick',
-                lat: 51.503780,
-                lng: -0.096500,
-                desc: 'Outstanding locally-sourced specialty coffee shop, delicious fresh toasties, and robust house bakes on Union Street.',
-                time: '4 mins',
-                buzzOffer: '25% off any beverages'
+                lat: 51.505214,
+                lng: -0.091858,
+                desc: 'Outstanding locally-sourced specialty coffee shop, delicious fresh toasties, and robust house bakes.',
+                time: '6 mins',
+                buzzOffer: '25% off any beverages',
+                url: 'https://www.thegentlemenbaristas.com/'
             },
             {
                 id: 'origin',
-                name: 'Origin Coffee Roasters (Scoresby St)',
+                name: 'Origin Coffee Roasters',
                 category: 'quick',
-                lat: 51.503650,
-                lng: -0.098450,
-                desc: 'Scoresby Street specialty coffee roasters serving an expansive breakfast & lunch menu under the railway arches.',
-                time: '3 mins',
-                buzzOffer: '10% off Food (Mon-Sun)'
+                lat: 51.504292,
+                lng: -0.103575,
+                desc: 'Specialty coffee roasters serving an expansive breakfast & lunch menu under the railway arches.',
+                time: '4 mins',
+                buzzOffer: '10% off Food (Mon-Sun)',
+                url: 'https://www.origincoffee.co.uk/'
             },
             {
                 id: 'balabaya',
-                name: 'Bala Baya (Old Union Yard)',
+                name: 'Bala Baya',
                 category: 'sitdown',
-                lat: 51.503520,
-                lng: -0.098250,
+                lat: 51.503270,
+                lng: -0.101862,
                 desc: 'Stunning Tel Aviv style spot under Old Union Yard Arches. Flatbreads, hummus, and slow-cooked meats.',
                 time: '4 mins',
-                buzzOffer: '20% off food (Mon-Sun lunch & weekend brunch)'
+                buzzOffer: '20% off food (Mon-Sun lunch & weekend brunch)',
+                url: 'https://balabaya.co.uk/'
             },
             {
                 id: 'gails',
-                name: "GAIL's Bakery (Sumner Street)",
+                name: "Gail's Bakery",
                 category: 'quick',
-                lat: 51.506150,
-                lng: -0.100300,
-                desc: 'Artisanal sourdough bread, premium sausage rolls, salads, and seasonal lunch cakes on Sumner Street.',
-                time: '1 min'
+                lat: 51.502046,
+                lng: -0.097891,
+                desc: 'Artisanal sourdough bread, premium sausage rolls, salads, and seasonal lunch cakes.',
+                time: '6 mins',
+                url: 'https://gailsbread.co.uk/'
             },
             {
                 id: 'flatironsquare',
                 name: 'Flat Iron Square',
                 category: 'market',
-                lat: 51.503950,
-                lng: -0.095650,
-                desc: 'Buzzed street food hub on Union Street featuring craft beer taps, rotating food vans, and great vibes.',
+                lat: 51.504584,
+                lng: -0.095400,
+                desc: 'Buzzed street food hub featuring craft beer taps, rotating food vans, and great vibes.',
                 time: '5 mins',
-                buzzOffer: '10% off food and drink (Tue 12-6pm, Wed/Thu 12-4pm). Code: BUZZ10'
-            },
-            {
-                id: 'pancakes',
-                name: 'Where the Pancakes Are (Flat Iron Square)',
-                category: 'sitdown',
-                lat: 51.504100,
-                lng: -0.095850,
-                desc: 'Buttermilk pancakes with sweet or savory toppings in an airy space along Southwark Bridge Road.',
-                time: '5 mins',
-                buzzOffer: '15% off Breakfast, Brunch, Brinner (Mon-Fri)'
-            },
-            {
-                id: 'novotel',
-                name: 'Gourmet Bar at Novotel',
-                category: 'sitdown',
-                lat: 51.505050,
-                lng: -0.103950,
-                desc: 'Relaxed modern hotel bar on Southwark Street near Blackfriars Road. Serving high-quality burgers, wraps, and flatbreads.',
-                time: '4 mins',
-                buzzOffer: '15% off food and drink'
-            },
-            {
-                id: 'lantana',
-                name: 'Lantana (London Bridge)',
-                category: 'sitdown',
-                lat: 51.504950,
-                lng: -0.094250,
-                desc: 'Aussie-style cafe with excellent coffee and healthy, creative mains near Flat Iron Square.',
-                time: '5 mins',
-                buzzOffer: '10% off Mon-Fri (8am-4pm) | 20% off after 4pm'
-            },
-            {
-                id: 'atis',
-                name: 'Atis (Borough Yards)',
-                category: 'quick',
-                lat: 51.506120,
-                lng: -0.091350,
-                desc: 'Premium salad & warm grain bowls. The go-to for a healthy, high-protein office lunch inside Borough Yards.',
-                time: '7 mins'
-            },
-            {
-                id: 'brothermarcus',
-                name: 'Brother Marcus (Borough Yards)',
-                category: 'sitdown',
-                lat: 51.506280,
-                lng: -0.091450,
-                desc: 'Eastern Mediterranean small plates. Beautiful interiors; perfect for impressing clients.',
-                time: '7 mins',
-                buzzOffer: '20% off brunch food (Mon-Fri)'
-            },
-            {
-                id: 'bardaskal',
-                name: 'Bar Daskal (Borough Yards)',
-                category: 'sitdown',
-                lat: 51.506180,
-                lng: -0.091250,
-                desc: 'Gorgeous Spanish wine and tapas bar inside Borough Yards. Excellent cured meats and sherries.',
-                time: '7 mins',
-                buzzOffer: '15% off the total bill'
-            },
-            {
-                id: 'cafefrancois',
-                name: 'Café François (Borough Yards)',
-                category: 'sitdown',
-                lat: 51.505950,
-                lng: -0.090850,
-                desc: 'Sophisticated French brasserie in Borough Yards. Reimagined staple baguettes, rotisserie, and divine pastries.',
-                time: '7 mins',
-                buzzOffer: '20% off breakfast (Tue-Fri, orders 8am-9.30am)'
-            },
-            {
-                id: 'bancone',
-                name: 'Bancone (Borough Yards)',
-                category: 'sitdown',
-                lat: 51.506220,
-                lng: -0.091000,
-                desc: 'Michelin Bib Gourmand fresh pasta spot inside Borough Yards. Gorgeous counter seating perfect for business duos.',
-                time: '7 mins',
-                buzzOffer: '20% off food (Mon-Fri, lunch only 12pm-4pm)'
-            },
-            {
-                id: 'bardouro',
-                name: 'Bar Douro (Flat Iron Square)',
-                category: 'sitdown',
-                lat: 51.503950,
-                lng: -0.095850,
-                desc: 'Exquisite traditional Portuguese tapas and wine in an authentic azulejos tile setting at Flat Iron Square.',
-                time: '5 mins',
-                buzzOffer: '10% off total bill (valid all day, everyday with food)'
-            },
-            {
-                id: 'swantheglobe',
-                name: 'The Swan at the Globe',
-                category: 'sitdown',
-                lat: 51.508150,
-                lng: -0.097200,
-                desc: 'Fabulous riverfront gastropub right next to the historic Globe Theatre. Ideal for high-end client sessions.',
-                time: '5 mins',
-                buzzOffer: '20% off food and drink'
-            },
-            {
-                id: 'pilpelsouthwark',
-                name: 'Pilpel Southwark Street',
-                category: 'quick',
-                lat: 51.505080,
-                lng: -0.093550,
-                desc: 'Legitimate local sensation for hand-rolled, melt-in-the-mouth chickpea falafel pitas and customized Mediterranean boxes on Southwark Street.',
-                time: '5 mins',
-                buzzOffer: '15% off any falafel pita or salad container'
-            },
-            {
-                id: 'plaza',
-                name: 'Plaza Khao Gaeng (Borough Market)',
-                category: 'sitdown',
-                lat: 51.505950,
-                lng: -0.090950,
-                desc: 'Tucked inside the railway arches of Stoney Street. Authentic southern Thai curries and sizzling stir-fries.',
-                time: '7 mins',
-                buzzOffer: '25% off the full bill (Mon-Fri, lunch only 12pm-6pm, max 4 guests)'
-            },
-            {
-                id: 'roast',
-                name: 'Roast (Borough Market)',
-                category: 'sitdown',
-                lat: 51.505600,
-                lng: -0.090550,
-                desc: 'Stunning, iconic restaurant suspended high above the Borough Market floor. Famous for high-end roast meats.',
-                time: '8 mins',
-                buzzOffer: '50% off food'
-            },
-            {
-                id: 'boroughmarket',
-                name: 'Borough Market',
-                category: 'market',
-                lat: 51.505150,
-                lng: -0.091300,
-                desc: 'Iconic street food. Grab a salt beef bagel, fresh oysters, or a gourmet cheese toastie.',
-                time: '7 mins'
-            },
-            {
-                id: 'padella',
-                name: 'Padella (Borough Market)',
-                category: 'sitdown',
-                lat: 51.505430,
-                lng: -0.089550,
-                desc: 'Arguably the best fresh hand-rolled pasta in London. Located directly opposite the tube exit. Queue early if you want a seat!',
-                time: '8 mins'
-            },
-            {
-                id: 'keuborough',
-                name: 'Kêu (Borough High Street)',
-                category: 'quick',
-                lat: 51.504620,
-                lng: -0.089800,
-                desc: 'Saigon street food and legendary banh mi baguettes made fresh on Borough High Street. Crispy pork belly is a standout.',
-                time: '8 mins',
-                buzzOffer: '10% discount on all food dishes'
-            },
-            {
-                id: 'swiftbar',
-                name: 'Swift (Borough High Street)',
-                category: 'sitdown',
-                lat: 51.504800,
-                lng: -0.088500,
-                desc: 'Elegant cocktail bar on Borough High Street. Serves premium Italian aperitivos, craft cocktails, and high-quality bar snacks.',
-                time: '8 mins',
-                buzzOffer: '25% off all night every Monday'
-            },
-            {
-                id: 'angrycrab',
-                name: 'Angry Crab Shack (Borough High Street)',
-                category: 'sitdown',
-                lat: 51.505100,
-                lng: -0.088000,
-                desc: 'Decadent seafood boil and cajun-style dining on Borough High Street. Perfect for an indulgent team celebratory catch-up.',
-                time: '8 mins',
-                buzzOffer: '10% off all menu items'
-            },
-            {
-                id: 'honestburgers',
-                name: 'Honest Burgers (Borough High Street)',
-                category: 'sitdown',
-                lat: 51.504750,
-                lng: -0.089500,
-                desc: 'Incredible British beef burgers served with their signature rosemary salted chips.',
-                time: '8 mins',
-                buzzOffer: '10% off food (Mon-Thu)'
-            },
-            {
-                id: 'francomanca',
-                name: 'Franco Manca (London Bridge)',
-                category: 'sitdown',
-                lat: 51.505128,
-                lng: -0.090260,
-                desc: 'Famous Neapolitan sourdough pizza cooked in a traditional wood-fired oven.',
-                time: '7 mins',
-                buzzOffer: '10% off food and drink (Mon-Thu)'
-            },
-            {
-                id: 'mallow',
-                name: 'Mallow (Borough Market)',
-                category: 'sitdown',
-                lat: 51.505036,
-                lng: -0.090958,
-                desc: '100% plant-based dining from the team behind Mildreds, offering vibrant, colorful global dishes.',
-                time: '7 mins',
-                buzzOffer: '10% off food and drink (Mon-Sun)'
-            },
-            {
-                id: 'arabica',
-                name: 'Arabica (Borough Market)',
-                category: 'sitdown',
-                lat: 51.505600,
-                lng: -0.090830,
-                desc: 'Delicious Levantine dishes, from colorful meze and clay oven flatbreads to charcoal grills.',
-                time: '7 mins'
-            },
-            {
-                id: 'bao',
-                name: 'BAO (Borough Market)',
-                category: 'sitdown',
-                lat: 51.505040,
-                lng: -0.090480,
-                desc: 'Vibrant Taiwanese spot famous for its fluffy steamed buns, fried chicken, and high-energy bar.',
-                time: '7 mins'
-            },
-            {
-                id: 'elliots',
-                name: "Elliot's (Borough Market)",
-                category: 'sitdown',
-                lat: 51.505210,
-                lng: -0.091470,
-                desc: "Vibrant, produce-driven cooking featuring wood-fired pizzas and natural wines right next to Borough Market.",
-                time: '7 mins',
-                buzzOffer: '10% off food (Mon-Wed)'
+                buzzOffer: '10% off food and drink (Tue 12-6pm, Wed/Thu 12-4pm). Code: BUZZ10',
+                url: 'https://www.flatironsquare.co.uk/'
             }
         ];
 
@@ -637,7 +425,7 @@
 
         const map = L.map('map', {
             zoomControl: false
-        }).setView([51.50582, -0.09955], 16);
+        }).setView([51.505615, -0.098869], 16);
 
         L.control.zoom({
             position: 'bottomright'
@@ -650,7 +438,7 @@
         }).addTo(map);
 
         // --- Walking Time Concentric Circles Setup ---
-        const officeCoords = [51.50582, -0.09955];
+        const officeCoords = [51.505615, -0.098869];
         const ringData = [
             { limit: '2 min', radius: 165, color: '#10B981', desc: '2 Mins walking radius (~165m)' },   // Emerald
             { limit: '3 min', radius: 250, color: '#06B6D4', desc: '3 Mins walking radius (~250m)' },   // Cyan
@@ -710,7 +498,9 @@
                 // Show corresponding marker on map
                 if (markers[loc.id]) markers[loc.id].addTo(map);
 
-                count++;
+                if (loc.category !== 'office') {
+                    count++;
+                }
                 const config = catConfig[loc.category];
 
                 const listItem = document.createElement('div');
@@ -728,6 +518,18 @@
                     `;
                 }
 
+                // Add action links for the list item (updated origin to use "90, 100 Southwark St, London SE1 0SW")
+                let listLinksHtml = '';
+                if (loc.category !== 'office') {
+                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
+                    listLinksHtml = `
+                        <div class="mt-3 flex gap-2" onclick="event.stopPropagation();">
+                            ${loc.url ? `<a href="${loc.url}" target="_blank" class="flex-grow text-center bg-[#5877e9]/10 hover:bg-[#5877e9] text-[#5877e9] hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#5877e9]/20">🌐 Website</a>` : ''}
+                            <a href="${directionsUrl}" target="_blank" class="flex-grow text-center bg-[#000749]/10 hover:bg-[#000749] text-[#000749] hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#000749]/20">🚶‍♂️ Directions</a>
+                        </div>
+                    `;
+                }
+
                 listItem.innerHTML = `
                     <div class="flex justify-between items-start">
                         <h3 class="font-extrabold text-sm ${highlightClass} flex items-center gap-1.5 tracking-tight">
@@ -739,6 +541,7 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">${loc.desc}</p>
                     ${buzzBadgeHtml}
+                    ${listLinksHtml}
                     <div class="mt-2.5 text-[10px] font-bold tracking-wider uppercase ${
                         loc.category === 'office' ? 'text-[#000749]' :
                         loc.category === 'quick' ? 'text-emerald-500' : 
@@ -795,6 +598,18 @@
                 `;
             }
 
+            // Build links for Website and Google Maps walking directions inside popups (updated origin to use "90, 100 Southwark St, London SE1 0SW")
+            let popupLinksHtml = '';
+            if (loc.category !== 'office') {
+                const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
+                popupLinksHtml = `
+                    <div class="flex gap-2 border-t border-gray-100 pt-2.5 mt-2.5">
+                        ${loc.url ? `<a href="${loc.url}" target="_blank" style="color: #ffffff !important;" class="flex-grow text-center bg-[#5877e9] hover:bg-[#4663cf] text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all border border-[#5877e9]/20 block">🌐 Website</a>` : ''}
+                        <a href="${directionsUrl}" target="_blank" style="color: #ffffff !important;" class="flex-grow text-center bg-[#000749] hover:bg-[#5877e9] text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all border border-[#000749]/20 block">🚶‍♂️ Directions</a>
+                    </div>
+                `;
+            }
+
             // Bind Popup
             const popupContent = `
                 <div class="custom-popup">
@@ -805,6 +620,7 @@
                     <div class="popup-body">
                         <p class="font-bold text-xs text-gray-500 uppercase tracking-wide mb-1">${config.label} • ${loc.time} walk</p>
                         <p class="text-gray-700 leading-relaxed">${loc.desc}</p>
+                        ${popupLinksHtml}
                     </div>
                 </div>
             `;
