@@ -76,12 +76,11 @@
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
             <div>
                 <h1 class="text-xl font-extrabold text-[#000749] flex items-center gap-1 tracking-tight">
-                    London Bridge Lunch Map
+                    Bankside Lunch Spots
                 </h1>
-                <p class="text-xs text-gray-500 mt-0.5 font-medium">OMG Bankside 3 Hub</p>
             </div>
             <span class="bg-[#5877e9]/10 text-[#5877e9] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-[#5877e9]/20">
-                Omnicom Media Group
+                Omnicom Media
             </span>
         </div>
 
@@ -96,7 +95,7 @@
                 <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-xs font-semibold rounded text-[#334155] hover:bg-slate-100 transition-all text-center">Shops</button>
             </div>
             <div class="flex justify-between items-center mt-3 px-1">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Verified Neighborhood Spots</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">LUNCH SPOTS</p>
                 <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">42</span> / 42 spots</span>
             </div>
         </div>
@@ -113,28 +112,28 @@
             <div class="flex items-start gap-2">
                 <span class="text-xs mt-0.5">💡</span>
                 <p>
-                    <strong>OMG Bankside 3 Guide:</strong> This map directory contains local dining spots. Please double-check menu details, hours, and active <a href="https://betterbankside.co.uk/offers/category/dining-and-drinking" target="_blank" class="text-[#5877e9] hover:underline font-bold">Better Bankside Buzz Card</a> discounts directly with the venues before visiting.
+                    <strong>Bankside Lunch Guide:</strong> This map directory was built by <a href="https://www.linkedin.com/in/sandeepahluwaliauk/" target="_blank" class="text-[#5877e9] hover:underline font-bold">Sandeep Ahluwalia</a> with the help of AI. This map directory contains local dining spots. Please double-check menu details, hours, and active <a href="https://betterbankside.co.uk/offers/category/dining-and-drinking" target="_blank" class="text-[#5877e9] hover:underline font-bold">Better Bankside Buzz Card</a> discounts before visiting.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- Map Container -->
-    <div class="flex-1 h-[45%] md:h-full relative">
+    <!-- Map Container - Hidden entirely on mobile, visible on tablet & desktop -->
+    <div class="hidden md:block flex-1 h-full relative">
         <div id="map"></div>
         
         <!-- Legend Overlay inside Map -->
         <div class="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-lg rounded-xl p-3.5 z-[1000] border border-gray-100 max-w-[200px] pointer-events-auto">
-            <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
-                <h4 class="text-xs font-bold text-gray-800 flex items-center gap-1">
+            <div id="legend-header" class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
+                <h4 class="text-xs font-bold text-gray-800 flex items-center gap-1 whitespace-nowrap">
                     🚶‍♂️ Walking Rings
                 </h4>
-                <label class="relative inline-flex items-center cursor-pointer">
+                <label class="relative inline-flex items-center cursor-pointer ml-3">
                     <input type="checkbox" id="toggle-rings" checked onchange="toggleRings(this.checked)" class="sr-only peer">
                     <div class="w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#000749]"></div>
                 </label>
             </div>
-            <div class="space-y-1.5 text-[11px] font-medium text-gray-600">
+            <div id="legend-body" class="space-y-1.5 text-[11px] font-medium text-gray-600">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="w-3 h-3 rounded-full border border-dashed bg-cyan-500/15 border-cyan-500"></span>
@@ -162,16 +161,14 @@
 
     <script>
         // Leaflet / Map Initialization & Predefined Locations (42 Curated Audited Spots + Office)
-        // Meticulously updated category parameters: "Quick" options are now strictly 5 minutes or less from the office.
-        // Audited coordinates and web addresses from local records are fully maintained.
         const locations = [
             {
                 id: 'mediahub',
-                name: 'Your Office (Bankside 3)',
+                name: 'Omnicom Media HQ',
                 category: 'office',
                 lat: 51.505615,
                 lng: -0.098869,
-                desc: 'OMG / Mediahub offices, located at 90, 100 Southwark St, London SE1 0SW.',
+                desc: 'Omnicom Media HQ, located at 90, 100 Southwark St, London SE1 0SW.',
                 time: '0 min',
                 url: 'https://omnicommedia.com/'
             },
@@ -189,7 +186,7 @@
             {
                 id: 'leonsouthwark',
                 name: 'LEON Borough Market',
-                category: 'sitdown', // Reassigned from quick (8 mins > 5 mins)
+                category: 'sitdown',
                 lat: 51.505215,
                 lng: -0.089776,
                 desc: 'Excellent healthy fast food box-meals, wraps, and specialty baked fries, located at Borough Market.',
@@ -230,7 +227,7 @@
             {
                 id: 'olivesandoregano',
                 name: 'Olives and Oregano',
-                category: 'sitdown', // Reassigned from quick (10 mins > 5 mins)
+                category: 'sitdown',
                 lat: 51.501608,
                 lng: -0.092377,
                 desc: 'Delicious Greek souvlaki, gyro wraps, and fresh oregano fries. Located as The Authentic Souvlaki on Tabard St.',
@@ -355,7 +352,7 @@
             {
                 id: 'gentlemenbaristas',
                 name: 'The Gentlemen Baristas',
-                category: 'sitdown', // Reassigned from quick (6 mins > 5 mins)
+                category: 'sitdown',
                 lat: 51.505214,
                 lng: -0.091858,
                 desc: 'Outstanding locally-sourced specialty coffee shop, delicious fresh toasties, and robust house bakes.',
@@ -388,7 +385,7 @@
             {
                 id: 'gails',
                 name: "Gail's Bakery",
-                category: 'sitdown', // Reassigned from quick (6 mins > 5 mins)
+                category: 'sitdown',
                 lat: 51.502046,
                 lng: -0.097891,
                 desc: 'Artisanal sourdough bread, premium sausage rolls, salads, and seasonal lunch cakes.',
@@ -480,7 +477,7 @@
             {
                 id: 'banksidecafe',
                 name: 'The Bankside Cafe',
-                category: 'sitdown', // Reassigned from quick (7 mins > 5 mins)
+                category: 'sitdown',
                 lat: 51.503880,
                 lng: -0.106709,
                 desc: 'Traditional English cafe serving legendary breakfasts and hot lunch rolls at 2-3 Hatfields, SE1 8DQ.',
@@ -550,7 +547,7 @@
             {
                 id: 'ricecoming',
                 name: 'Rice Coming Noodle Bar',
-                category: 'sitdown', // Reassigned from quick (8 mins > 5 mins)
+                category: 'sitdown',
                 lat: 51.500923,
                 lng: -0.094023,
                 desc: 'Authentic Chinese / Hunan-style spicy noodle bowls located at 218 Borough High St, SE1 1JX.',
@@ -560,7 +557,7 @@
             {
                 id: 'xianbiangbiang',
                 name: "Xi'an BiangBiang Noodles",
-                category: 'sitdown', // Reassigned from quick (10 mins > 5 mins)
+                category: 'sitdown',
                 lat: 51.505533,
                 lng: -0.087849,
                 desc: "Famous Chinese Xi'an wide hand-pulled noodles located at 35 Railway Approach, SE1 9SS.",
@@ -657,12 +654,18 @@
             .addTo(ringGroup);
         });
 
-        // Toggle rings layer group visibility
+        // Toggle rings layer group visibility & collapse legend body dynamically
         function toggleRings(visible) {
+            const legendBody = document.getElementById('legend-body');
+            const legendHeader = document.getElementById('legend-header');
             if (visible) {
                 map.addLayer(ringGroup);
+                legendBody.classList.remove('hidden');
+                legendHeader.classList.add('border-b', 'border-gray-100', 'mb-2', 'pb-1.5');
             } else {
                 map.removeLayer(ringGroup);
+                legendBody.classList.add('hidden');
+                legendHeader.classList.remove('border-b', 'border-gray-100', 'mb-2', 'pb-1.5');
             }
         }
 
@@ -747,11 +750,9 @@
                 `;
 
                 listItem.addEventListener('click', () => {
+                    // Navigate the Leaflet map state, which remains active for desktop resizing
                     map.setView([loc.lat, loc.lng], 18, { animate: true, duration: 1 });
                     if (markers[loc.id]) markers[loc.id].openPopup();
-                    if(window.innerWidth < 768) {
-                       document.querySelector('#map').scrollIntoView({behavior: "smooth"});
-                    }
                 });
 
                 listContainer.appendChild(listItem);
@@ -836,7 +837,7 @@
         function filterSpots(category) {
             const filterBtns = ['all', 'buzz', 'quick', 'sitdown', 'market', 'shop'];
             filterBtns.forEach(btn => {
-                const el = document.getElementById(`filter-${btn}`);
+                const el = document.getElementById('filter-' + btn);
                 if (btn === category) {
                     if (category === 'buzz') {
                         el.className = "py-1.5 text-xs font-bold rounded bg-amber-500 text-white shadow-sm transition-all text-center";
