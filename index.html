@@ -69,11 +69,13 @@
         .marker-quick { background-color: #10B981; }
         .marker-sitdown { background-color: #F59E0B; }
         .marker-market { background-color: #EF4444; }
+        .marker-shop { background-color: #334155; } /* Slate Blue for shops */
 
         .header-office { background-color: #000749; }
         .header-quick { background-color: #10B981; }
         .header-sitdown { background-color: #F59E0B; }
         .header-market { background-color: #EF4444; }
+        .header-shop { background-color: #334155; }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
@@ -100,18 +102,19 @@
             </span>
         </div>
 
-        <!-- Filter Bar with 🐝 Buzz Offers -->
+        <!-- Filter Bar with 🐝 Buzz Offers and Shops -->
         <div class="p-4 bg-gray-50 border-b border-gray-100 shrink-0">
-            <div class="bg-gray-200/60 p-1 rounded-lg flex gap-1">
-                <button onclick="filterSpots('all')" id="filter-all" class="flex-1 py-1.5 text-xs font-bold rounded bg-white text-gray-800 shadow-sm transition-all">All</button>
-                <button onclick="filterSpots('buzz')" id="filter-buzz" class="flex-1 py-1.5 text-xs font-semibold rounded text-amber-700 hover:bg-amber-100 transition-all">🐝 Buzz Deals</button>
-                <button onclick="filterSpots('quick')" id="filter-quick" class="flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all">Quick</button>
-                <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all">Sit-Down</button>
-                <button onclick="filterSpots('market')" id="filter-market" class="flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all">Markets</button>
+            <div class="bg-gray-200/60 p-1 rounded-lg grid grid-cols-3 gap-1">
+                <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-xs font-bold rounded bg-white text-gray-800 shadow-sm transition-all text-center">All</button>
+                <button onclick="filterSpots('buzz')" id="filter-buzz" class="py-1.5 text-xs font-semibold rounded text-amber-700 hover:bg-amber-100 transition-all text-center">🐝 Buzz</button>
+                <button onclick="filterSpots('quick')" id="filter-quick" class="py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center">Quick</button>
+                <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center">Sit-Down</button>
+                <button onclick="filterSpots('market')" id="filter-market" class="py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center">Markets</button>
+                <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center">Shops</button>
             </div>
             <div class="flex justify-between items-center mt-3 px-1">
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Verified Neighborhood Spots</p>
-                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">30</span> / 30 spots</span>
+                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">40</span> / 40 spots</span>
             </div>
         </div>
         
@@ -182,7 +185,7 @@
     </div>
 
     <script>
-        // Leaflet / Map Initialization & Predefined Locations (30 Curated Spots with Buzz Card Offers mapped!)
+        // Leaflet / Map Initialization & Predefined Locations (40 Curated Spots + Office)
         const locations = [
             {
                 id: 'mediahub',
@@ -204,6 +207,16 @@
                 buzzOffer: '15% off food & drinks (Fri-Tue)'
             },
             {
+                id: 'leonsouthwark',
+                name: 'LEON Southwark Street',
+                category: 'quick',
+                lat: 51.5055,
+                lng: -0.1013,
+                desc: 'Located practically next door. Excellent healthy, Mediterranean-inspired fast food box-meals, wraps, and specialty gluten-free baked fries.',
+                time: '2 mins',
+                buzzOffer: '15% discount on food (excludes delivery platforms)'
+            },
+            {
                 id: 'blacksheep',
                 name: 'Black Sheep Coffee',
                 category: 'quick',
@@ -220,6 +233,33 @@
                 lng: -0.1005,
                 desc: 'Award-winning brunch and lunch spot. Fantastic quality and sustainable sourcing.',
                 time: '2 mins'
+            },
+            {
+                id: 'philpotts',
+                name: 'Philpotts Southwark Street',
+                category: 'quick',
+                lat: 51.5053,
+                lng: -0.0968,
+                desc: 'The corporate office champion for bespoke freshly-crafted baguettes, specialty deli sandwiches, and customized green salad boxes.',
+                time: '3 mins'
+            },
+            {
+                id: 'olivesandoregano',
+                name: 'Olives & Oregano',
+                category: 'quick',
+                lat: 51.5051,
+                lng: -0.0955,
+                desc: 'Bustling Greek street-food counter down Southwark Street. Serving delicious, hand-rolled souvlaki, gyro wraps, and fresh oregano fries.',
+                time: '3 mins'
+            },
+            {
+                id: 'gofalafel',
+                name: 'Go Falafel Southwark',
+                category: 'quick',
+                lat: 51.5048,
+                lng: -0.0988,
+                desc: 'Fantastic 100% vegan fast-grab counter. Incredible fresh chickpea falafel wraps filled with house hummus, pickled cabbage, and tahini.',
+                time: '3 mins'
             },
             {
                 id: 'honipoke',
@@ -240,6 +280,51 @@
                 desc: 'Nutritious Asian-inspired food. Freshly made sushi, steamed bao, gyoza, and warm noodle bowls.',
                 time: '2 mins',
                 buzzOffer: '10% off food (select local staff discount on kiosk)'
+            },
+            {
+                id: 'msfood',
+                name: 'M&S Simply Food (Bankside)',
+                category: 'shop',
+                lat: 51.5055,
+                lng: -0.0999,
+                desc: 'Outstanding gourmet supermarket directly in your building complex. The go-to for quality sandwiches, salads, and iconic office snacks.',
+                time: '1 min'
+            },
+            {
+                id: 'sainsburyssouthwark',
+                name: "Sainsbury's Local (Southwark St)",
+                category: 'shop',
+                lat: 51.5052,
+                lng: -0.1015,
+                desc: 'Supermarket right across the road next to the Blue Fin building. Extremely fast and well-stocked for classic £3.50 lunch meal deals.',
+                time: '2 mins'
+            },
+            {
+                id: 'tescosouthwark',
+                name: 'Tesco Express (Southwark St)',
+                category: 'shop',
+                lat: 51.5050,
+                lng: -0.1030,
+                desc: 'Convenient grocery express store located just down Southwark Street. Reliable range of meal deals, snack options, and fruit boxes.',
+                time: '3 mins'
+            },
+            {
+                id: 'coopgreatsuffolk',
+                name: 'Co-op Food (Great Suffolk St)',
+                category: 'shop',
+                lat: 51.5039,
+                lng: -0.1002,
+                desc: 'Spacious food store positioned just south of Southwark Street. Excellent bakery section for warm pastry items and quick lunchtime salads.',
+                time: '3 mins'
+            },
+            {
+                id: 'sainsburysborough',
+                name: "Sainsbury's Local (Borough High St)",
+                category: 'shop',
+                lat: 51.5049,
+                lng: -0.0905,
+                desc: 'A large local supermarket right next to Borough High Street tube exit. Handy for grabbing high-quality drinks and quick cold bites.',
+                time: '6 mins'
             },
             {
                 id: 'capricci',
@@ -420,6 +505,16 @@
                 buzzOffer: '20% off food and drink'
             },
             {
+                id: 'pilpelsouthwark',
+                name: 'Pilpel Southwark Street',
+                category: 'quick',
+                lat: 51.5052,
+                lng: -0.0930,
+                desc: 'Legitimate local sensation for hand-rolled, melt-in-the-mouth chickpea falafel pitas and customized Mediterranean boxes.',
+                time: '4 mins',
+                buzzOffer: '15% off any falafel pita or salad container'
+            },
+            {
                 id: 'plaza',
                 name: 'Plaza Khao Gaeng',
                 category: 'sitdown',
@@ -494,7 +589,8 @@
             'office': { color: 'marker-office', bg: 'header-office', label: 'Your Office', icon: '🏢' },
             'quick': { color: 'marker-quick', bg: 'header-quick', label: 'Quick / Desk Eats', icon: '🥗' },
             'sitdown': { color: 'marker-sitdown', bg: 'header-sitdown', label: 'Sit-Down / Meetings', icon: '🍽️' },
-            'market': { color: 'marker-market', bg: 'header-market', label: 'Markets / Hubs', icon: '🎪' }
+            'market': { color: 'marker-market', bg: 'header-market', label: 'Markets / Hubs', icon: '🎪' },
+            'shop': { color: 'marker-shop', bg: 'header-shop', label: 'Shops / Supermarkets', icon: '🏪' }
         };
 
         const map = L.map('map', {
@@ -604,7 +700,8 @@
                     <div class="mt-2.5 text-[10px] font-bold tracking-wider uppercase ${
                         loc.category === 'office' ? 'text-[#000749]' :
                         loc.category === 'quick' ? 'text-emerald-500' : 
-                        loc.category === 'sitdown' ? 'text-amber-500' : 'text-red-500'
+                        loc.category === 'sitdown' ? 'text-amber-500' : 
+                        loc.category === 'shop' ? 'text-slate-600' : 'text-red-500'
                     }">
                         ${config.label}
                     </div>
@@ -677,22 +774,26 @@
             }
         }, 500);
 
-        // Sidebar Category Filters
+        // Sidebar Category Filters (Updated with Shop styles)
         function filterSpots(category) {
-            const filterBtns = ['all', 'buzz', 'quick', 'sitdown', 'market'];
+            const filterBtns = ['all', 'buzz', 'quick', 'sitdown', 'market', 'shop'];
             filterBtns.forEach(btn => {
                 const el = document.getElementById(`filter-${btn}`);
                 if (btn === category) {
                     if (category === 'buzz') {
-                        el.className = "flex-1 py-1.5 text-xs font-bold rounded bg-amber-500 text-white shadow-sm transition-all";
+                        el.className = "py-1.5 text-xs font-bold rounded bg-amber-500 text-white shadow-sm transition-all text-center";
+                    } else if (category === 'shop') {
+                        el.className = "py-1.5 text-xs font-bold rounded bg-[#334155] text-white shadow-sm transition-all text-center";
                     } else {
-                        el.className = "flex-1 py-1.5 text-xs font-bold rounded bg-[#000749] text-white shadow-sm transition-all";
+                        el.className = "py-1.5 text-xs font-bold rounded bg-[#000749] text-white shadow-sm transition-all text-center";
                     }
                 } else {
                     if (btn === 'buzz') {
-                        el.className = "flex-1 py-1.5 text-xs font-semibold rounded text-amber-600 hover:bg-amber-100 transition-all";
+                        el.className = "py-1.5 text-xs font-semibold rounded text-amber-600 hover:bg-amber-100 transition-all text-center";
+                    } else if (btn === 'shop') {
+                        el.className = "py-1.5 text-xs font-semibold rounded text-[#334155] hover:bg-slate-100 transition-all text-center";
                     } else {
-                        el.className = "flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all";
+                        el.className = "py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center";
                     }
                 }
             });
