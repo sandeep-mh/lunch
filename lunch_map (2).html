@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunch Spots near Mediahub</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS & JS for the map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        body, html { height: 100%; margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
+        #map { height: 100%; width: 100%; z-index: 1; }
+        
+        .custom-popup .leaflet-popup-content-wrapper {
+            border-radius: 0.5rem;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .custom-popup .leaflet-popup-content {
+            margin: 0;
+            width: 250px !important;
+        }
+        .popup-header {
+            padding: 10px 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .popup-body {
+            padding: 12px;
+            font-size: 13px;
+            color: #374151;
+        }
+        
+        /* Custom map markers CSS aligned with Omnicom Branding */
+        .map-marker {
+            width: 30px;
+            height: 30px;
+            border-radius: 50% 50% 50% 0;
+            background: #5877e9;
+            position: absolute;
+            transform: rotate(-45deg);
+            left: 50%;
+            top: 50%;
+            margin: -15px 0 0 -15px;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .map-marker::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            margin: 8px 0 0 8px;
+            background: #fff;
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        /* Category Marker Background Colors */
+        .marker-office { background-color: #000749; } /* OMG Stratos Blue */
+        .marker-quick { background-color: #10B981; }
+        .marker-sitdown { background-color: #F59E0B; }
+        .marker-market { background-color: #EF4444; }
+
+        .header-office { background-color: #000749; }
+        .header-quick { background-color: #10B981; }
+        .header-sitdown { background-color: #F59E0B; }
+        .header-market { background-color: #EF4444; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen bg-gray-50">
+
+    <!-- Sidebar Wrapper -->
+    <div class="w-full md:w-[450px] bg-white shadow-xl flex flex-col h-2/5 md:h-full z-10 overflow-hidden">
+        
+        <!-- App Title Header -->
+        <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
+            <div>
+                <h1 class="text-xl font-extrabold text-[#000749] flex items-center gap-1 tracking-tight">
+                    London Bridge Lunch Map
+                </h1>
+                <p class="text-xs text-gray-500 mt-0.5 font-medium">OMG Bankside 3 Hub</p>
+            </div>
+            <span class="bg-[#5877e9]/10 text-[#5877e9] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-[#5877e9]/20">
+                Omnicom Media Group
+            </span>
+        </div>
+
+        <!-- Filter Bar with 🐝 Buzz Offers -->
+        <div class="p-4 bg-gray-50 border-b border-gray-100 shrink-0">
+            <div class="bg-gray-200/60 p-1 rounded-lg flex gap-1">
+                <button onclick="filterSpots('all')" id="filter-all" class="flex-1 py-1.5 text-xs font-bold rounded bg-white text-gray-800 shadow-sm transition-all">All</button>
+                <button onclick="filterSpots('buzz')" id="filter-buzz" class="flex-1 py-1.5 text-xs font-semibold rounded text-amber-700 hover:bg-amber-100 transition-all">🐝 Buzz Deals</button>
+                <button onclick="filterSpots('quick')" id="filter-quick" class="flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all">Quick</button>
+                <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all">Sit-Down</button>
+                <button onclick="filterSpots('market')" id="filter-market" class="flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all">Markets</button>
+            </div>
+            <div class="flex justify-between items-center mt-3 px-1">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Verified Neighborhood Spots</p>
+                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">30</span> / 30 spots</span>
+            </div>
+        </div>
+        
+        <!-- Directory List Panel -->
+        <div class="overflow-y-auto flex-1 p-4 space-y-3 bg-white">
+            <div id="location-list" class="space-y-3">
+                <!-- JavaScript will populate this list -->
+            </div>
+        </div>
+
+        <!-- Sticky Safety Disclaimer Footer -->
+        <div class="p-4 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 leading-normal shrink-0 select-none">
+            <div class="flex items-start gap-2">
+                <span class="text-xs mt-0.5">💡</span>
+                <p>
+                    <strong>OMG Bankside 3 Guide:</strong> This map directory contains local dining spots. Please double-check menu details, hours, and active Better Bankside Buzz Card discounts directly with the venues before visiting.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div class="flex-1 h-3/5 md:h-full relative">
+        <div id="map"></div>
+        
+        <!-- Legend Overlay inside Map -->
+        <div class="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-lg rounded-xl p-3.5 z-[1000] border border-gray-100 max-w-[200px] pointer-events-auto">
+            <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
+                <h4 class="text-xs font-bold text-gray-800 flex items-center gap-1">
+                    🚶‍♂️ Walking Rings
+                </h4>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="toggle-rings" checked onchange="toggleRings(this.checked)" class="sr-only peer">
+                    <div class="w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#000749]"></div>
+                </label>
+            </div>
+            <div class="space-y-1.5 text-[11px] font-medium text-gray-600">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full border border-dashed bg-emerald-500/15 border-emerald-500"></span>
+                        <span>2 Mins</span>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-mono">~165m</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full border border-dashed bg-cyan-500/15 border-cyan-500"></span>
+                        <span>3 Mins</span>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-mono">~250m</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full border border-dashed bg-amber-500/15 border-amber-500"></span>
+                        <span>5 Mins</span>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-mono">~415m</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full border border-dashed bg-red-500/15 border-red-500"></span>
+                        <span>10 Mins</span>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-mono">~830m</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Leaflet / Map Initialization & Predefined Locations (30 Curated Spots with Buzz Card Offers mapped!)
+        const locations = [
+            {
+                id: 'mediahub',
+                name: 'Your Office (Bankside 3)',
+                category: 'office',
+                lat: 51.5058,
+                lng: -0.0996,
+                desc: 'Mediahub / Omnicom Media Group offices.',
+                time: '0 min'
+            },
+            {
+                id: 'refinery',
+                name: 'The Refinery Bankside',
+                category: 'sitdown',
+                lat: 51.5056,
+                lng: -0.1011,
+                desc: 'Located right next door in the Blue Fin Building. Perfect for team lunches, quick drinks, or casual business chats.',
+                time: '1 min',
+                buzzOffer: '15% off food & drinks (Fri-Tue)'
+            },
+            {
+                id: 'blacksheep',
+                name: 'Black Sheep Coffee',
+                category: 'quick',
+                lat: 51.5056,
+                lng: -0.0980,
+                desc: 'Super quick coffee, specialty waffles, and premium toasties right down Southwark Street.',
+                time: '1 min'
+            },
+            {
+                id: 'tablecafe',
+                name: 'The Table Café',
+                category: 'sitdown',
+                lat: 51.5059,
+                lng: -0.1005,
+                desc: 'Award-winning brunch and lunch spot. Fantastic quality and sustainable sourcing.',
+                time: '2 mins'
+            },
+            {
+                id: 'honipoke',
+                name: 'Honi Poke Bankside',
+                category: 'quick',
+                lat: 51.5065,
+                lng: -0.1001,
+                desc: 'Incredible fresh, customizable poke bowls. Superb healthy grab-and-go option.',
+                time: '2 mins',
+                buzzOffer: '15% off on your orders. Code: 15offBUZZ'
+            },
+            {
+                id: 'itsusouthwark',
+                name: 'ITSU Southwark',
+                category: 'quick',
+                lat: 51.5054,
+                lng: -0.1014,
+                desc: 'Nutritious Asian-inspired food. Freshly made sushi, steamed bao, gyoza, and warm noodle bowls.',
+                time: '2 mins',
+                buzzOffer: '10% off food (select local staff discount on kiosk)'
+            },
+            {
+                id: 'capricci',
+                name: 'Capricci NEO Bankside',
+                category: 'sitdown',
+                lat: 51.5068,
+                lng: -0.1018,
+                desc: 'Charming authentic Italian trattoria offering delicious artisanal pastas and a stellar wine list.',
+                time: '3 mins',
+                buzzOffer: '15% off your meal and wine'
+            },
+            {
+                id: 'tate',
+                name: 'Tate Modern (The Corner)',
+                category: 'quick',
+                lat: 51.5076,
+                lng: -0.0990,
+                desc: 'Beautiful riverside hangout inside Tate Modern. Great coffee, light bites, and craft beers.',
+                time: '3 mins',
+                buzzOffer: '20% off after 5pm'
+            },
+            {
+                id: 'caravan',
+                name: 'Caravan Bankside',
+                category: 'sitdown',
+                lat: 51.5042,
+                lng: -0.0988,
+                desc: 'Stunning industrial-chic warehouse cafe. Globally-inspired small plates and legendary specialty coffee.',
+                time: '3 mins',
+                buzzOffer: '15% off your bill (Mon-Fri, up to 8 guests)'
+            },
+            {
+                id: 'gentlemenbaristas',
+                name: 'The Gentlemen Baristas',
+                category: 'quick',
+                lat: 51.5062,
+                lng: -0.0945,
+                desc: 'Outstanding locally-sourced coffee, delicious fresh toasties, and robust house bakes.',
+                time: '3 mins',
+                buzzOffer: '25% off any beverages'
+            },
+            {
+                id: 'origin',
+                name: 'Origin Coffee Roasters',
+                category: 'quick',
+                lat: 51.5039,
+                lng: -0.0985,
+                desc: 'Scoresby Street specialty coffee roasters serving an expansive breakfast & lunch menu.',
+                time: '4 mins',
+                buzzOffer: '10% off Food (Mon-Sun)'
+            },
+            {
+                id: 'balabaya',
+                name: 'Bala Baya',
+                category: 'sitdown',
+                lat: 51.5041,
+                lng: -0.0982,
+                desc: 'Stunning Tel Aviv style spot under Old Union Yard Arches. Flatbreads, hummus, and slow-cooked meats.',
+                time: '4 mins',
+                buzzOffer: '20% off food (Mon-Sun lunch & weekend brunch)'
+            },
+            {
+                id: 'gails',
+                name: "Gail's Bakery",
+                category: 'quick',
+                lat: 51.5036,
+                lng: -0.0945,
+                desc: 'Artisanal sourdough bread, premium sausage rolls, salads, and seasonal lunch cakes.',
+                time: '4 mins'
+            },
+            {
+                id: 'flatironsquare',
+                name: 'Flat Iron Square',
+                category: 'market',
+                lat: 51.5042,
+                lng: -0.0980,
+                desc: 'Buzzed street food hub featuring craft beer taps, rotating food vans, and great vibes.',
+                time: '4 mins',
+                buzzOffer: '10% off food and drink (Tue 12-6pm, Wed/Thu 12-4pm). Code: BUZZ10'
+            },
+            {
+                id: 'pancakes',
+                name: 'Where the Pancakes Are',
+                category: 'sitdown',
+                lat: 51.5041,
+                lng: -0.0975,
+                desc: 'Buttermilk pancakes with sweet or savory toppings in an airy wood-clad space.',
+                time: '4 mins',
+                buzzOffer: '15% off Breakfast, Brunch, Brinner (Mon-Fri)'
+            },
+            {
+                id: 'novotel',
+                name: 'Gourmet Bar at Novotel',
+                category: 'sitdown',
+                lat: 51.5036,
+                lng: -0.0948,
+                desc: 'Relaxed modern hotel bar serving high-quality burgers, wraps, flatbreads, and casual pints.',
+                time: '4 mins',
+                buzzOffer: '15% off food and drink'
+            },
+            {
+                id: 'lantana',
+                name: 'Lantana',
+                category: 'sitdown',
+                lat: 51.5052,
+                lng: -0.0942,
+                desc: 'Aussie-style cafe with excellent coffee and healthy, creative mains.',
+                time: '4 mins',
+                buzzOffer: '10% off Mon-Fri (8am-4pm) | 20% off after 4pm'
+            },
+            {
+                id: 'atis',
+                name: 'Atis (Borough Yards)',
+                category: 'quick',
+                lat: 51.5060,
+                lng: -0.0910,
+                desc: 'Premium salad & warm bowls. The go-to for a healthy, high-protein office lunch.',
+                time: '5 mins'
+            },
+            {
+                id: 'brothermarcus',
+                name: 'Brother Marcus',
+                category: 'sitdown',
+                lat: 51.5057,
+                lng: -0.0915,
+                desc: 'Eastern Mediterranean small plates. Beautiful interiors; perfect for impressing clients.',
+                time: '5 mins',
+                buzzOffer: '20% off brunch food (Mon-Fri)'
+            },
+            {
+                id: 'bardaskal',
+                name: 'Bar Daskal',
+                category: 'sitdown',
+                lat: 51.5061,
+                lng: -0.0911,
+                desc: 'Gorgeous Spanish wine and tapas bar inside Borough Yards. Excellent cured meats and sherries.',
+                time: '5 mins',
+                buzzOffer: '15% off the total bill'
+            },
+            {
+                id: 'cafefrancois',
+                name: 'Café François',
+                category: 'sitdown',
+                lat: 51.5062,
+                lng: -0.0913,
+                desc: 'Sophisticated French brasserie. Reimagined staple baguettes, rotisserie, and divine pastries.',
+                time: '5 mins',
+                buzzOffer: '20% off breakfast (Tue-Fri, orders 8am-9.30am)'
+            },
+            {
+                id: 'bancone',
+                name: 'Bancone Borough Yards',
+                category: 'sitdown',
+                lat: 51.5063,
+                lng: -0.0912,
+                desc: 'Michelin Bib Gourmand fresh pasta spot. Gorgeous counter seating perfect for business duos.',
+                time: '5 mins',
+                buzzOffer: '20% off food (Mon-Fri, lunch only 12pm-4pm)'
+            },
+            {
+                id: 'bardouro',
+                name: 'Bar Douro',
+                category: 'sitdown',
+                lat: 51.5044,
+                lng: -0.0952,
+                desc: 'Exquisite traditional Portuguese tapas and wine in an authentic azulejos tile setting.',
+                time: '5 mins',
+                buzzOffer: '10% off total bill (valid all day, everyday with food)'
+            },
+            {
+                id: 'swantheglobe',
+                name: 'The Swan at the Globe',
+                category: 'sitdown',
+                lat: 51.5081,
+                lng: -0.0955,
+                desc: 'Fabulous riverfront gastropub right next to the historic Globe. Ideal for high-end client sessions.',
+                time: '5 mins',
+                buzzOffer: '20% off food and drink'
+            },
+            {
+                id: 'plaza',
+                name: 'Plaza Khao Gaeng',
+                category: 'sitdown',
+                lat: 51.5051,
+                lng: -0.0910,
+                desc: 'Tucked inside the railway arches of Stoney Street. Authentic southern Thai curries and sizzling stir-fries.',
+                time: '6 mins',
+                buzzOffer: '25% off the full bill (Mon-Fri, lunch only 12pm-6pm, max 4 guests)'
+            },
+            {
+                id: 'roast',
+                name: 'Roast',
+                category: 'sitdown',
+                lat: 51.5052,
+                lng: -0.0902,
+                desc: 'Stunning, iconic restaurant suspended high above the Borough Market floor. Famous for high-end roast meats.',
+                time: '6 mins',
+                buzzOffer: '50% off food'
+            },
+            {
+                id: 'boroughmarket',
+                name: 'Borough Market',
+                category: 'market',
+                lat: 51.5054,
+                lng: -0.0908,
+                desc: 'Iconic street food. Grab a salt beef bagel, fresh oysters, or a gourmet cheese toastie.',
+                time: '6 mins'
+            },
+            {
+                id: 'padella',
+                name: 'Padella',
+                category: 'sitdown',
+                lat: 51.5053,
+                lng: -0.0895,
+                desc: 'Arguably the best pasta in London for the price. Queue early if you want a seat!',
+                time: '7 mins'
+            },
+            {
+                id: 'keuborough',
+                name: 'Kêu Borough',
+                category: 'quick',
+                lat: 51.5050,
+                lng: -0.0888,
+                desc: 'Saigon street food and legendary banh mi baguettes made fresh. Crispy pork belly is a standout.',
+                time: '8 mins',
+                buzzOffer: '10% discount on all food dishes'
+            },
+            {
+                id: 'swiftbar',
+                name: 'Swift Bar (Borough)',
+                category: 'sitdown',
+                lat: 51.5048,
+                lng: -0.0885,
+                desc: 'Elegant cocktail bar. Serves premium Italian aperitivos, craft cocktails, and high-quality bar snacks.',
+                time: '8 mins',
+                buzzOffer: '25% off all night every Monday'
+            },
+            {
+                id: 'angrycrab',
+                name: 'Angry Crab Shack',
+                category: 'sitdown',
+                lat: 51.5051,
+                lng: -0.0880,
+                desc: 'Decadent seafood boil and cajun-style dining. Perfect for an indulgent team celebratory catch-up.',
+                time: '8 mins',
+                buzzOffer: '10% off all menu items'
+            }
+        ];
+
+        // Configuration mapping
+        const catConfig = {
+            'office': { color: 'marker-office', bg: 'header-office', label: 'Your Office', icon: '🏢' },
+            'quick': { color: 'marker-quick', bg: 'header-quick', label: 'Quick / Desk Eats', icon: '🥗' },
+            'sitdown': { color: 'marker-sitdown', bg: 'header-sitdown', label: 'Sit-Down / Meetings', icon: '🍽️' },
+            'market': { color: 'marker-market', bg: 'header-market', label: 'Markets / Hubs', icon: '🎪' }
+        };
+
+        const map = L.map('map', {
+            zoomControl: false
+        }).setView([51.5050, -0.0950], 16);
+
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // --- Walking Time Concentric Circles Setup ---
+        const officeCoords = [51.5058, -0.0996];
+        const ringData = [
+            { limit: '2 min', radius: 165, color: '#10B981', desc: '2 Mins walking radius (~165m)' },   // Emerald
+            { limit: '3 min', radius: 250, color: '#06B6D4', desc: '3 Mins walking radius (~250m)' },   // Cyan
+            { limit: '5 min', radius: 415, color: '#F59E0B', desc: '5 Mins walking radius (~415m)' },   // Amber
+            { limit: '10 min', radius: 830, color: '#EF4444', desc: '10 Mins walking radius (~830m)' }  // Red
+        ];
+
+        const ringGroup = L.layerGroup().addTo(map);
+
+        // Add rings from outer (10 mins) to inner (2 mins) to keep smaller elements hoverable
+        ringData.slice().reverse().forEach(ring => {
+            L.circle(officeCoords, {
+                radius: ring.radius,
+                color: ring.color,
+                weight: 1.5,
+                dashArray: '5, 5',
+                fillColor: ring.color,
+                fillOpacity: 0.03,
+                interactive: true
+            })
+            .bindTooltip(ring.desc, { sticky: true, className: 'text-xs font-semibold rounded px-2 py-1 shadow' })
+            .addTo(ringGroup);
+        });
+
+        // Toggle rings layer group visibility
+        function toggleRings(visible) {
+            if (visible) {
+                map.addLayer(ringGroup);
+            } else {
+                map.removeLayer(ringGroup);
+            }
+        }
+
+        const markers = {};
+
+        // Render standard spots list
+        function renderSpotsList(filterCategory = 'all') {
+            const listContainer = document.getElementById('location-list');
+            listContainer.innerHTML = '';
+            
+            let count = 0;
+
+            locations.forEach(loc => {
+                // Apply category filtering
+                if (filterCategory !== 'all') {
+                    if (filterCategory === 'buzz') {
+                        if (!loc.buzzOffer && loc.category !== 'office') {
+                            if (markers[loc.id]) map.removeLayer(markers[loc.id]);
+                            return;
+                        }
+                    } else if (loc.category !== filterCategory && loc.category !== 'office') {
+                        if (markers[loc.id]) map.removeLayer(markers[loc.id]);
+                        return;
+                    }
+                }
+                
+                // Show corresponding marker on map
+                if (markers[loc.id]) markers[loc.id].addTo(map);
+
+                count++;
+                const config = catConfig[loc.category];
+
+                const listItem = document.createElement('div');
+                listItem.className = 'p-3.5 rounded-lg border border-gray-100 bg-white hover:border-[#5877e9]/30 hover:shadow-md transition-all cursor-pointer group';
+                
+                let highlightClass = loc.category === 'office' ? 'text-[#000749]' : 'text-gray-800 group-hover:text-[#5877e9]';
+
+                // Render dynamic Buzz badge if offer exists
+                let buzzBadgeHtml = '';
+                if (loc.buzzOffer) {
+                    buzzBadgeHtml = `
+                        <div class="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 w-fit">
+                            🐝 Buzz Card: ${loc.buzzOffer}
+                        </div>
+                    `;
+                }
+
+                listItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-extrabold text-sm ${highlightClass} flex items-center gap-1.5 tracking-tight">
+                            ${config.icon} ${loc.name}
+                        </h3>
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full whitespace-nowrap">
+                            ${loc.time}
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">${loc.desc}</p>
+                    ${buzzBadgeHtml}
+                    <div class="mt-2.5 text-[10px] font-bold tracking-wider uppercase ${
+                        loc.category === 'office' ? 'text-[#000749]' :
+                        loc.category === 'quick' ? 'text-emerald-500' : 
+                        loc.category === 'sitdown' ? 'text-amber-500' : 'text-red-500'
+                    }">
+                        ${config.label}
+                    </div>
+                `;
+
+                listItem.addEventListener('click', () => {
+                    map.setView([loc.lat, loc.lng], 18, { animate: true, duration: 1 });
+                    if (markers[loc.id]) markers[loc.id].openPopup();
+                    if(window.innerWidth < 768) {
+                       document.querySelector('#map').scrollIntoView({behavior: "smooth"});
+                    }
+                });
+
+                listContainer.appendChild(listItem);
+            });
+
+            document.getElementById('spots-count').innerText = count;
+        }
+
+        // Initialize markers on map initially
+        locations.forEach(loc => {
+            const config = catConfig[loc.category];
+
+            // Create Map Marker
+            const iconHtml = `<div class="map-marker ${config.color}"></div>`;
+            const customIcon = L.divIcon({
+                html: iconHtml,
+                className: '',
+                iconSize: [30, 30],
+                iconAnchor: [15, 30],
+                popupAnchor: [0, -32]
+            });
+
+            const marker = L.marker([loc.lat, loc.lng], { icon: customIcon });
+            
+            // Render Buzz alert in marker popups
+            let popupBuzzStrip = '';
+            if (loc.buzzOffer) {
+                popupBuzzStrip = `
+                    <div class="bg-amber-100 border-b border-amber-200 px-3 py-1.5 text-[11px] text-amber-900 font-bold flex items-center gap-1">
+                        🐝 Buzz Offer: ${loc.buzzOffer}
+                    </div>
+                `;
+            }
+
+            // Bind Popup
+            const popupContent = `
+                <div class="custom-popup">
+                    <div class="popup-header ${config.bg}">
+                        ${config.icon} ${loc.name}
+                    </div>
+                    ${popupBuzzStrip}
+                    <div class="popup-body">
+                        <p class="font-bold text-xs text-gray-500 uppercase tracking-wide mb-1">${config.label} • ${loc.time} walk</p>
+                        <p class="text-gray-700 leading-relaxed">${loc.desc}</p>
+                    </div>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+            markers[loc.id] = marker;
+        });
+
+        // Initial Render
+        renderSpotsList('all');
+
+        // Open Office popup on startup
+        setTimeout(() => {
+            if (markers['mediahub']) {
+                markers['mediahub'].addTo(map).openPopup();
+            }
+        }, 500);
+
+        // Sidebar Category Filters
+        function filterSpots(category) {
+            const filterBtns = ['all', 'buzz', 'quick', 'sitdown', 'market'];
+            filterBtns.forEach(btn => {
+                const el = document.getElementById(`filter-${btn}`);
+                if (btn === category) {
+                    if (category === 'buzz') {
+                        el.className = "flex-1 py-1.5 text-xs font-bold rounded bg-amber-500 text-white shadow-sm transition-all";
+                    } else {
+                        el.className = "flex-1 py-1.5 text-xs font-bold rounded bg-[#000749] text-white shadow-sm transition-all";
+                    }
+                } else {
+                    if (btn === 'buzz') {
+                        el.className = "flex-1 py-1.5 text-xs font-semibold rounded text-amber-600 hover:bg-amber-100 transition-all";
+                    } else {
+                        el.className = "flex-1 py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all";
+                    }
+                }
+            });
+            renderSpotsList(category);
+        }
+    </script>
+</body>
+</html>
