@@ -131,15 +131,15 @@
             <!-- Filter Bar with Extended 4x2 Grid Options -->
             <div class="p-4 bg-gray-50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700 shrink-0 transition-colors">
                 <div class="bg-gray-200/60 dark:bg-slate-700 p-1 rounded-lg grid grid-cols-4 gap-1 transition-colors">
-                    <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-[11px] font-bold rounded bg-white dark:bg-slate-800 text-gray-800 dark:text-white shadow-sm transition-all text-center flex items-center justify-center">All</button>
-                    <button onclick="filterSpots('buzz')" id="filter-buzz" class="py-1.5 text-[11px] font-semibold rounded text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600 transition-all text-center flex items-center justify-center">🐝 Buzz</button>
-                    <button onclick="filterSpots('quick')" id="filter-quick" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Quick Eats</button>
-                    <button onclick="filterSpots('coffee')" id="filter-coffee" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Coffee</button>
+                    <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-[11px] font-bold rounded bg-[#000749] dark:bg-[#5877e9] text-white shadow-sm transition-all text-center flex items-center justify-center h-full">All</button>
+                    <button onclick="filterSpots('buzz')" id="filter-buzz" class="py-1.5 text-[11px] font-semibold rounded text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-all text-center flex items-center justify-center h-full">🐝 Buzz</button>
+                    <button onclick="filterSpots('quick')" id="filter-quick" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition-all text-center flex items-center justify-center h-full">Quick Eats</button>
+                    <button onclick="filterSpots('coffee')" id="filter-coffee" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:bg-[#8B4513]/10 dark:hover:bg-[#8B4513]/30 hover:text-[#8B4513] dark:hover:text-amber-500 transition-all text-center flex items-center justify-center h-full">Coffee</button>
                     
-                    <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Sit-Down</button>
-                    <button onclick="filterSpots('market')" id="filter-market" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Markets</button>
-                    <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Shops</button>
-                    <button onclick="surpriseMe()" id="filter-surprise" class="py-1.5 text-[11px] font-semibold rounded text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-slate-600 transition-all text-center flex items-center justify-center gap-1">🎲 Surprise</button>
+                    <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-400 transition-all text-center flex items-center justify-center h-full">Sit-Down</button>
+                    <button onclick="filterSpots('market')" id="filter-market" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 transition-all text-center flex items-center justify-center h-full">Markets</button>
+                    <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200 transition-all text-center flex items-center justify-center h-full">Shops</button>
+                    <button onclick="surpriseMe()" id="filter-surprise" class="py-1.5 text-[11px] font-semibold rounded text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-all text-center flex items-center justify-center gap-1 h-full">🎲 Surprise</button>
                 </div>
                 <div class="flex justify-between items-center mt-3 px-1">
                     <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">LUNCH SPOTS</p>
@@ -1115,8 +1115,13 @@
             }
         }, 500);
 
+        // State tracking to manage map view resets
+        let isSurpriseMode = false;
+
         // Interactive Surprise Me Logic
         function surpriseMe() {
+            isSurpriseMode = true;
+            
             // Re-style UI specific to Surprise button
             filterSpots('surprise', true);
             
@@ -1151,6 +1156,13 @@
 
         // Sidebar Category Central Filter Routing
         function filterSpots(category, skipRender = false) {
+            // Reset map view to default if exiting Surprise mode
+            if (isSurpriseMode && category !== 'surprise') {
+                map.setView([51.505615, -0.098869], 16, { animate: true, duration: 1 });
+                map.closePopup();
+                isSurpriseMode = false;
+            }
+
             const filterBtns = ['all', 'buzz', 'quick', 'coffee', 'sitdown', 'market', 'shop', 'surprise'];
             
             filterBtns.forEach(btn => {
@@ -1159,27 +1171,28 @@
                 
                 // Base classes required for the 4x2 unified grid appearance
                 let baseClass = "py-1.5 text-[11px] rounded transition-all text-center flex items-center justify-center h-full ";
+                if (btn === 'surprise') baseClass += "gap-1 ";
                 
                 if (btn === category) {
-                    if (category === 'buzz') {
-                        el.className = baseClass + "font-bold bg-amber-500 text-white shadow-sm";
-                    } else if (category === 'shop') {
-                        el.className = baseClass + "font-bold bg-slate-700 dark:bg-slate-300 text-white dark:text-slate-900 shadow-sm";
-                    } else if (category === 'coffee') {
-                        el.className = baseClass + "font-bold bg-[#8B4513] text-white shadow-sm";
-                    } else if (category === 'surprise') {
-                        el.className = baseClass + "font-bold bg-purple-600 text-white shadow-sm gap-1";
-                    } else {
-                        el.className = baseClass + "font-bold bg-[#000749] dark:bg-[#5877e9] text-white shadow-sm";
-                    }
+                    // Active States (matching pin colors)
+                    if (btn === 'all') el.className = baseClass + "font-bold bg-[#000749] dark:bg-[#5877e9] text-white shadow-sm";
+                    else if (btn === 'buzz') el.className = baseClass + "font-bold bg-amber-500 text-white shadow-sm";
+                    else if (btn === 'quick') el.className = baseClass + "font-bold bg-emerald-500 text-white shadow-sm";
+                    else if (btn === 'coffee') el.className = baseClass + "font-bold bg-[#8B4513] dark:bg-amber-700 text-white shadow-sm";
+                    else if (btn === 'sitdown') el.className = baseClass + "font-bold bg-amber-500 text-white shadow-sm";
+                    else if (btn === 'market') el.className = baseClass + "font-bold bg-red-500 text-white shadow-sm";
+                    else if (btn === 'shop') el.className = baseClass + "font-bold bg-slate-600 dark:bg-slate-500 text-white shadow-sm";
+                    else if (btn === 'surprise') el.className = baseClass + "font-bold bg-purple-600 text-white shadow-sm";
                 } else {
-                    if (btn === 'buzz') {
-                        el.className = baseClass + "font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600";
-                    } else if (btn === 'surprise') {
-                        el.className = baseClass + "font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-slate-600 gap-1";
-                    } else {
-                        el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-200/50 dark:hover:bg-slate-600";
-                    }
+                    // Inactive Hover States (matching pin colors softly)
+                    if (btn === 'all') el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-[#000749]/10 dark:hover:bg-[#5877e9]/20 hover:text-[#000749] dark:hover:text-[#8ba2ff]";
+                    else if (btn === 'buzz') el.className = baseClass + "font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30";
+                    else if (btn === 'quick') el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400";
+                    else if (btn === 'coffee') el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-[#8B4513]/10 dark:hover:bg-[#8B4513]/30 hover:text-[#8B4513] dark:hover:text-amber-500";
+                    else if (btn === 'sitdown') el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-400";
+                    else if (btn === 'market') el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400";
+                    else if (btn === 'shop') el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200";
+                    else if (btn === 'surprise') el.className = baseClass + "font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30";
                 }
             });
 
