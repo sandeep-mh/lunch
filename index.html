@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lunch Spots near Mediahub</title>
     
-    <!-- Tailwind CSS for styling -->
+    <!-- Tailwind CSS with Dark Mode Configuration -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
     
     <!-- Leaflet CSS & JS for the map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -16,26 +24,38 @@
         body, html { height: 100%; margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
         #map { height: 100%; width: 100%; z-index: 1; }
         
+        /* Popup Wrappers: Native styling for light/dark transitions binding correctly to Leaflet's structure */
         .custom-popup .leaflet-popup-content-wrapper {
-            border-radius: 0.5rem;
-            padding: 0;
-            overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff !important;
+            border-radius: 0.75rem !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
         }
         .custom-popup .leaflet-popup-content {
-            margin: 0;
-            width: 250px !important;
+            margin: 0 !important;
+            width: 265px !important;
         }
-        .popup-header {
-            padding: 10px 12px;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
+        .custom-popup .leaflet-popup-tip {
+            background-color: #ffffff !important;
+            transition: background-color 0.2s ease;
         }
-        .popup-body {
-            padding: 12px;
-            font-size: 13px;
-            color: #374151;
+        .custom-popup .leaflet-popup-close-button {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            padding-top: 6px !important;
+            padding-right: 6px !important;
+            font-weight: 200;
+        }
+
+        /* Deep Dark Mode Popup Support */
+        .dark .custom-popup .leaflet-popup-content-wrapper {
+            background-color: #1e293b !important; /* slate-800 */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4) !important;
+        }
+        .dark .custom-popup .leaflet-popup-tip {
+            background-color: #1e293b !important;
         }
 
         /* Force popup buttons to maintain crisp white text, overriding Leaflet's high-specificity default link blue */
@@ -62,104 +82,207 @@
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* --- Dark Mode Overrides for Leaflet Map Tiles --- */
+        .dark .leaflet-layer,
+        .dark .leaflet-control-zoom-in,
+        .dark .leaflet-control-zoom-out,
+        .dark .leaflet-control-attribution {
+            /* Sleek inversion matrix for dark mode map tiles */
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
     </style>
 </head>
-<body class="flex flex-col-reverse md:flex-row h-screen bg-gray-50">
+<body class="flex flex-col h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-200">
 
-    <!-- Sidebar Wrapper -->
-    <div class="w-full md:w-[450px] bg-white shadow-xl flex flex-col h-[55%] md:h-full z-10 overflow-hidden">
+    <!-- Main App Area -->
+    <div class="flex-1 flex flex-row overflow-hidden relative">
         
-        <!-- App Title Header -->
-        <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
-            <div>
-                <h1 class="text-xl font-extrabold text-[#000749] flex items-center gap-1 tracking-tight">
-                    Bankside Lunch Spots
-                </h1>
+        <!-- Sidebar Wrapper -->
+        <div id="sidebar-wrapper" class="w-full md:w-[450px] bg-white dark:bg-slate-800 shadow-[2px_0_15px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_15px_rgba(0,0,0,0.3)] flex flex-col h-full z-20 overflow-hidden transition-colors duration-200">
+            
+            <!-- App Title Header & Dark Mode Toggle -->
+            <div class="p-5 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center shrink-0 transition-colors">
+                <div>
+                    <h1 class="text-xl font-extrabold text-[#000749] dark:text-[#5877e9] flex items-center gap-1 tracking-tight transition-colors">
+                        Bankside Lunch Spots
+                    </h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-[#5877e9]/10 dark:bg-[#5877e9]/20 text-[#5877e9] dark:text-[#8ba2ff] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-[#5877e9]/20 dark:border-[#5877e9]/30 transition-colors">
+                        Omnicom Media
+                    </span>
+                    <button onclick="toggleTheme()" class="p-1.5 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-amber-400 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                        <!-- Sun Icon (visible in dark mode) -->
+                        <svg id="icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <!-- Moon Icon (visible in light mode) -->
+                        <svg id="icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                </div>
             </div>
-            <span class="bg-[#5877e9]/10 text-[#5877e9] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-[#5877e9]/20">
-                Omnicom Media
-            </span>
+
+            <!-- Filter Bar with 🐝 Buzz Offers and Shops -->
+            <div class="p-4 bg-gray-50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700 shrink-0 transition-colors">
+                <div class="bg-gray-200/60 dark:bg-slate-700 p-1 rounded-lg grid grid-cols-3 gap-1 transition-colors">
+                    <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-xs font-bold rounded bg-white dark:bg-slate-800 text-gray-800 dark:text-white shadow-sm transition-all text-center">All</button>
+                    <button onclick="filterSpots('buzz')" id="filter-buzz" class="py-1.5 text-xs font-semibold rounded text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600 transition-all text-center">🐝 Buzz</button>
+                    <button onclick="filterSpots('quick')" id="filter-quick" class="py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center">Quick</button>
+                    <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center">Sit-Down</button>
+                    <button onclick="filterSpots('market')" id="filter-market" class="py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center">Markets</button>
+                    <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-xs font-semibold rounded text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all text-center">Shops</button>
+                </div>
+                <div class="flex justify-between items-center mt-3 px-1">
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">LUNCH SPOTS</p>
+                    <span class="text-[10px] font-extrabold text-gray-500 dark:text-gray-400 bg-gray-200/50 dark:bg-slate-700/50 px-2 py-0.5 rounded-full"><span id="spots-count">42</span> / 42 spots</span>
+                </div>
+            </div>
+            
+            <!-- Directory List Panel -->
+            <div class="overflow-y-auto flex-1 p-4 space-y-3 bg-white dark:bg-slate-900 transition-colors">
+                <div id="location-list" class="space-y-3">
+                    <!-- JavaScript will populate this list -->
+                </div>
+            </div>
+
+            <!-- Sticky Safety Disclaimer Footer -->
+            <div class="p-4 bg-gray-50 dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 text-[10px] text-gray-500 dark:text-gray-400 leading-normal shrink-0 select-none transition-colors">
+                <div class="flex items-start gap-2">
+                    <span class="text-xs mt-0.5">💡</span>
+                    <p>
+                        <strong>Bankside Lunch Guide:</strong> This map directory was built by <a href="https://www.linkedin.com/in/sandeepahluwaliauk/" target="_blank" class="text-[#5877e9] dark:text-[#8ba2ff] hover:underline font-bold">Sandeep Ahluwalia</a> with the help of AI. Please double-check menu details, hours, and active <a href="https://betterbankside.co.uk/offers/category/dining-and-drinking" target="_blank" class="text-[#5877e9] dark:text-[#8ba2ff] hover:underline font-bold">Better Bankside Buzz Card</a> discounts before visiting.
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <!-- Filter Bar with 🐝 Buzz Offers and Shops -->
-        <div class="p-4 bg-gray-50 border-b border-gray-100 shrink-0">
-            <div class="bg-gray-200/60 p-1 rounded-lg grid grid-cols-3 gap-1">
-                <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-xs font-bold rounded bg-white text-gray-800 shadow-sm transition-all text-center">All</button>
-                <button onclick="filterSpots('buzz')" id="filter-buzz" class="py-1.5 text-xs font-semibold rounded text-amber-700 hover:bg-amber-100 transition-all text-center">🐝 Buzz</button>
-                <button onclick="filterSpots('quick')" id="filter-quick" class="py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center">Quick</button>
-                <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center">Sit-Down</button>
-                <button onclick="filterSpots('market')" id="filter-market" class="py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center">Markets</button>
-                <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-xs font-semibold rounded text-[#334155] hover:bg-slate-100 transition-all text-center">Shops</button>
-            </div>
-            <div class="flex justify-between items-center mt-3 px-1">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">LUNCH SPOTS</p>
-                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200/50 px-2 py-0.5 rounded-full"><span id="spots-count">42</span> / 42 spots</span>
-            </div>
-        </div>
-        
-        <!-- Directory List Panel -->
-        <div class="overflow-y-auto flex-1 p-4 space-y-3 bg-white">
-            <div id="location-list" class="space-y-3">
-                <!-- JavaScript will populate this list -->
-            </div>
-        </div>
-
-        <!-- Sticky Safety Disclaimer Footer -->
-        <div class="p-4 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 leading-normal shrink-0 select-none">
-            <div class="flex items-start gap-2">
-                <span class="text-xs mt-0.5">💡</span>
-                <p>
-                    <strong>Bankside Lunch Guide:</strong> This map directory was built by <a href="https://www.linkedin.com/in/sandeepahluwaliauk/" target="_blank" class="text-[#5877e9] hover:underline font-bold">Sandeep Ahluwalia</a> with the help of AI. Please double-check menu details, hours, and active <a href="https://betterbankside.co.uk/offers/category/dining-and-drinking" target="_blank" class="text-[#5877e9] hover:underline font-bold">Better Bankside Buzz Card</a> discounts before visiting.
-                </p>
+        <!-- Map Container - Hidden on mobile by default -->
+        <div id="map-wrapper" class="hidden md:block flex-1 h-full bg-gray-200 dark:bg-slate-900 relative z-10 transition-colors">
+            <div id="map"></div>
+            
+            <!-- Legend Overlay inside Map -->
+            <div class="absolute top-4 right-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur shadow-lg rounded-xl p-3.5 z-[1000] border border-gray-100 dark:border-slate-700 max-w-[200px] pointer-events-auto transition-colors">
+                <div id="legend-header" class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100 dark:border-slate-700 transition-colors">
+                    <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1 whitespace-nowrap">
+                        🚶‍♂️ Walking Rings
+                    </h4>
+                    <label class="relative inline-flex items-center cursor-pointer ml-3">
+                        <input type="checkbox" id="toggle-rings" checked onchange="toggleRings(this.checked)" class="sr-only peer">
+                        <div class="w-7 h-4 bg-gray-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#000749] dark:peer-checked:bg-[#5877e9]"></div>
+                    </label>
+                </div>
+                <div id="legend-body" class="space-y-1.5 text-[11px] font-medium text-gray-600 dark:text-gray-400">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full border border-dashed bg-cyan-500/15 border-cyan-500"></span>
+                            <span>3 Mins</span>
+                        </div>
+                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">~250m</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full border border-dashed bg-amber-500/15 border-amber-500"></span>
+                            <span>5 Mins</span>
+                        </div>
+                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">~415m</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full border border-dashed bg-red-500/15 border-red-500"></span>
+                            <span>10 Mins</span>
+                        </div>
+                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">~830m</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Map Container - Hidden entirely on mobile, visible on tablet & desktop -->
-    <div class="hidden md:block flex-1 h-full relative">
-        <div id="map"></div>
-        
-        <!-- Legend Overlay inside Map -->
-        <div class="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-lg rounded-xl p-3.5 z-[1000] border border-gray-100 max-w-[200px] pointer-events-auto">
-            <div id="legend-header" class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
-                <h4 class="text-xs font-bold text-gray-800 flex items-center gap-1 whitespace-nowrap">
-                    🚶‍♂️ Walking Rings
-                </h4>
-                <label class="relative inline-flex items-center cursor-pointer ml-3">
-                    <input type="checkbox" id="toggle-rings" checked onchange="toggleRings(this.checked)" class="sr-only peer">
-                    <div class="w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#000749]"></div>
-                </label>
-            </div>
-            <div id="legend-body" class="space-y-1.5 text-[11px] font-medium text-gray-600">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full border border-dashed bg-cyan-500/15 border-cyan-500"></span>
-                        <span>3 Mins</span>
-                    </div>
-                    <span class="text-[10px] text-gray-400 font-mono">~250m</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full border border-dashed bg-amber-500/15 border-amber-500"></span>
-                        <span>5 Mins</span>
-                    </div>
-                    <span class="text-[10px] text-gray-400 font-mono">~415m</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full border border-dashed bg-red-500/15 border-red-500"></span>
-                        <span>10 Mins</span>
-                    </div>
-                    <span class="text-[10px] text-gray-400 font-mono">~830m</span>
-                </div>
-            </div>
-        </div>
+    <!-- Mobile Navigation Tab Bar (Hidden on md and up) -->
+    <div class="md:hidden flex h-14 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 shrink-0 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.5)] transition-colors">
+        <button id="tab-list" onclick="switchMobileTab('list')" class="flex-1 flex flex-col items-center justify-center gap-1 text-[#5877e9] dark:text-[#8ba2ff] font-bold transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span class="text-[10px] uppercase tracking-wide">List</span>
+        </button>
+        <button id="tab-map" onclick="switchMobileTab('map')" class="flex-1 flex flex-col items-center justify-center gap-1 text-gray-400 dark:text-gray-500 font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+            <span class="text-[10px] uppercase tracking-wide">Map</span>
+        </button>
     </div>
 
     <script>
+        // --- Dark Mode Logic ---
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Check local storage or system preference on load
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- Mobile Tab Switching Logic ---
+        let currentTab = 'list';
+        function switchMobileTab(tab) {
+            currentTab = tab;
+            const sidebar = document.getElementById('sidebar-wrapper');
+            const mapWrapper = document.getElementById('map-wrapper');
+            const tabList = document.getElementById('tab-list');
+            const tabMap = document.getElementById('tab-map');
+
+            if (window.innerWidth < 768) {
+                if (tab === 'list') {
+                    sidebar.classList.remove('hidden');
+                    sidebar.classList.add('flex');
+                    mapWrapper.classList.add('hidden');
+                    mapWrapper.classList.remove('block');
+                    
+                    // Style active tab
+                    tabList.classList.add('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
+                    tabList.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                    tabMap.classList.remove('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
+                    tabMap.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                } else {
+                    sidebar.classList.add('hidden');
+                    sidebar.classList.remove('flex');
+                    mapWrapper.classList.remove('hidden');
+                    mapWrapper.classList.add('block');
+                    
+                    // Style active tab
+                    tabMap.classList.add('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
+                    tabMap.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                    tabList.classList.remove('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
+                    tabList.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                    
+                    // Crucial: Leaflet needs to know the container size changed when un-hidden
+                    setTimeout(() => { map.invalidateSize(true); }, 50);
+                }
+            } else {
+                // On desktop, both panels are always visible
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
+                mapWrapper.classList.remove('hidden');
+                mapWrapper.classList.add('block');
+            }
+        }
+
+        // Re-evaluate layout automatically if user rotates device or resizes window
+        window.addEventListener('resize', () => switchMobileTab(currentTab));
+
+
         // Leaflet / Map Initialization & Predefined Locations (42 Curated Audited Spots + Office)
         const locations = [
             {
@@ -650,7 +773,7 @@
                 fillOpacity: 0.03,
                 interactive: true
             })
-            .bindTooltip(ring.desc, { sticky: true, className: 'text-xs font-semibold rounded px-2 py-1 shadow' })
+            .bindTooltip(ring.desc, { sticky: true, className: 'text-xs font-semibold rounded px-2 py-1 shadow dark:bg-slate-800 dark:text-gray-200 dark:border-slate-700' })
             .addTo(ringGroup);
         });
 
@@ -661,11 +784,11 @@
             if (visible) {
                 map.addLayer(ringGroup);
                 legendBody.classList.remove('hidden');
-                legendHeader.classList.add('border-b', 'border-gray-100', 'mb-2', 'pb-1.5');
+                legendHeader.classList.add('border-b', 'border-gray-100', 'dark:border-slate-700', 'mb-2', 'pb-1.5');
             } else {
                 map.removeLayer(ringGroup);
                 legendBody.classList.add('hidden');
-                legendHeader.classList.remove('border-b', 'border-gray-100', 'mb-2', 'pb-1.5');
+                legendHeader.classList.remove('border-b', 'border-gray-100', 'dark:border-slate-700', 'mb-2', 'pb-1.5');
             }
         }
 
@@ -701,56 +824,61 @@
                 const config = catConfig[loc.category];
 
                 const listItem = document.createElement('div');
-                listItem.className = 'p-3.5 rounded-lg border border-gray-100 bg-white hover:border-[#5877e9]/30 hover:shadow-md transition-all cursor-pointer group';
+                // Added extensive dark mode UI classes
+                listItem.className = 'p-3.5 rounded-lg border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-[#5877e9]/30 dark:hover:border-[#5877e9]/50 hover:shadow-md transition-all cursor-pointer group';
                 
-                let highlightClass = loc.category === 'office' ? 'text-[#000749]' : 'text-gray-800 group-hover:text-[#5877e9]';
+                let highlightClass = loc.category === 'office' ? 'text-[#000749] dark:text-[#5877e9]' : 'text-gray-800 dark:text-gray-100 group-hover:text-[#5877e9] dark:group-hover:text-[#8ba2ff]';
 
                 // Render dynamic Buzz badge if offer exists
                 let buzzBadgeHtml = '';
                 if (loc.buzzOffer) {
                     buzzBadgeHtml = `
-                        <div class="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 w-fit">
+                        <div class="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-700/50 w-fit transition-colors">
                             🐝 Buzz Card: ${loc.buzzOffer}
                         </div>
                     `;
                 }
 
-                // Add action links for the list item (updated origin to full query)
+                // Add action links for the list item (updated styles for dark mode legibility)
                 let listLinksHtml = '';
                 if (loc.category !== 'office') {
                     const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
                     listLinksHtml = `
                         <div class="mt-3 flex gap-2" onclick="event.stopPropagation();">
-                            ${loc.url ? `<a href="${loc.url}" target="_blank" class="flex-grow text-center bg-[#5877e9]/10 hover:bg-[#5877e9] text-[#5877e9] hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#5877e9]/20">🌐 Website</a>` : ''}
-                            <a href="${directionsUrl}" target="_blank" class="flex-grow text-center bg-[#000749]/10 hover:bg-[#000749] text-[#000749] hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#000749]/20">🚶‍♂️ Directions</a>
+                            ${loc.url ? `<a href="${loc.url}" target="_blank" class="flex-1 text-center bg-[#5877e9]/10 dark:bg-[#5877e9]/20 hover:bg-[#5877e9] dark:hover:bg-[#5877e9] text-[#5877e9] dark:text-[#8ba2ff] hover:text-white dark:hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#5877e9]/20 dark:border-[#5877e9]/30 shadow-sm">🌐 Website</a>` : ''}
+                            <a href="${directionsUrl}" target="_blank" class="flex-1 text-center bg-[#000749]/10 dark:bg-slate-700 hover:bg-[#000749] dark:hover:bg-slate-600 text-[#000749] dark:text-gray-200 hover:text-white dark:hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#000749]/20 dark:border-slate-600 shadow-sm">🚶‍♂️ Directions</a>
                         </div>
                     `;
                 }
 
                 listItem.innerHTML = `
                     <div class="flex justify-between items-start">
-                        <h3 class="font-extrabold text-sm ${highlightClass} flex items-center gap-1.5 tracking-tight">
+                        <h3 class="font-extrabold text-sm ${highlightClass} flex items-center gap-1.5 tracking-tight transition-colors">
                             ${config.icon} ${loc.name}
                         </h3>
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full whitespace-nowrap">
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-full whitespace-nowrap transition-colors">
                             ${loc.time}
                         </span>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">${loc.desc}</p>
+                    <p class="text-xs font-medium text-gray-800 dark:text-gray-200 mt-1.5 leading-relaxed transition-colors">${loc.desc}</p>
                     ${buzzBadgeHtml}
                     ${listLinksHtml}
                     <div class="mt-2.5 text-[10px] font-bold tracking-wider uppercase ${
-                        loc.category === 'office' ? 'text-[#000749]' :
-                        loc.category === 'quick' ? 'text-emerald-500' : 
-                        loc.category === 'sitdown' ? 'text-amber-500' : 
-                        loc.category === 'shop' ? 'text-slate-600' : 'text-red-500'
-                    }">
+                        loc.category === 'office' ? 'text-[#000749] dark:text-[#5877e9]' :
+                        loc.category === 'quick' ? 'text-emerald-500 dark:text-emerald-400' : 
+                        loc.category === 'sitdown' ? 'text-amber-500 dark:text-amber-400' : 
+                        loc.category === 'shop' ? 'text-slate-600 dark:text-slate-400' : 'text-red-500 dark:text-red-400'
+                    } transition-colors">
                         ${config.label}
                     </div>
                 `;
 
                 listItem.addEventListener('click', () => {
-                    // Navigate the Leaflet map state, which remains active for desktop resizing
+                    // Automatically jump to the map view if tapped on mobile
+                    if (window.innerWidth < 768 && currentTab !== 'map') {
+                        switchMobileTab('map');
+                    }
+                    
                     map.setView([loc.lat, loc.lng], 18, { animate: true, duration: 1 });
                     if (markers[loc.id]) markers[loc.id].openPopup();
                 });
@@ -765,61 +893,85 @@
         locations.forEach(loc => {
             const config = catConfig[loc.category];
 
-            // SVG Custom Pin to ensure absolute precision, zero scaling/zooming drift, and crisp rendering
-            const iconHtml = `
-                <svg class="${config.textColor} drop-shadow-md" width="30" height="42" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0ZM15 21C11.6863 21 9 18.3137 9 15C9 11.6863 11.6863 9 15 9C18.3137 9 21 11.6863 21 15C21 18.3137 18.3137 21 15 21Z" fill="currentColor"/>
-                    <circle cx="15" cy="15" r="5" fill="#FFFFFF"/>
-                </svg>
-            `;
+            let iconHtml = '';
+            let customIconOpts = {};
 
-            const customIcon = L.divIcon({
-                html: iconHtml,
-                className: 'custom-marker-pin', // Uses reset styling class
-                iconSize: [30, 42],
-                iconAnchor: [15, 42], // Lock the pointing tip of the vector pin exactly on coordinate [X_center, Y_bottom]
-                popupAnchor: [0, -42]  // Anchor the popup exactly on top of the map pin
-            });
+            // --- DIFFERENTIATED HEADQUARTERS PIN ---
+            if (loc.category === 'office') {
+                // Generates a larger, 40x56 custom pin with an internal star and a glowing drop shadow
+                iconHtml = `
+                    <div class="relative group">
+                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-[#000749]/40 dark:bg-[#5877e9]/40 rounded-full animate-ping blur-[1px]"></div>
+                        <svg class="text-[#000749] dark:text-[#5877e9] drop-shadow-xl relative z-10" width="40" height="56" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0Z" fill="currentColor"/>
+                            <path d="M15 5.5L17.5 11.5L24 12.5L19 17L20.5 23.5L15 20.5L9.5 23.5L11 17L6 12.5L12.5 11.5L15 5.5Z" fill="#FFFFFF"/>
+                        </svg>
+                    </div>
+                `;
+                customIconOpts = {
+                    html: iconHtml,
+                    className: 'custom-marker-pin', 
+                    iconSize: [40, 56],
+                    iconAnchor: [20, 56],
+                    popupAnchor: [0, -56]
+                };
+            } else {
+                // --- STANDARD LOCATION PINS ---
+                iconHtml = `
+                    <svg class="${config.textColor} drop-shadow-md transition-colors" width="30" height="42" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0ZM15 21C11.6863 21 9 18.3137 9 15C9 11.6863 11.6863 9 15 9C18.3137 9 21 11.6863 21 15C21 18.3137 18.3137 21 15 21Z" fill="currentColor"/>
+                        <circle cx="15" cy="15" r="5" fill="#FFFFFF"/>
+                    </svg>
+                `;
+                customIconOpts = {
+                    html: iconHtml,
+                    className: 'custom-marker-pin', 
+                    iconSize: [30, 42],
+                    iconAnchor: [15, 42],
+                    popupAnchor: [0, -42]
+                };
+            }
 
+            const customIcon = L.divIcon(customIconOpts);
             const marker = L.marker([loc.lat, loc.lng], { icon: customIcon });
             
             // Render Buzz alert in marker popups
             let popupBuzzStrip = '';
             if (loc.buzzOffer) {
                 popupBuzzStrip = `
-                    <div class="bg-amber-100 border-b border-amber-200 px-3 py-1.5 text-[11px] text-amber-900 font-bold flex items-center gap-1">
+                    <div class="bg-amber-50 dark:bg-amber-900/40 border-b border-amber-200 dark:border-amber-700/50 px-3.5 py-2 text-[11px] text-amber-900 dark:text-amber-300 font-bold flex items-center gap-1.5 transition-colors">
                         🐝 Buzz Offer: ${loc.buzzOffer}
                     </div>
                 `;
             }
 
-            // Build links for Website and Google Maps walking directions inside popups (updated origin to use "Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW")
+            // Build links for Website and Google Maps walking directions inside popups
             let popupLinksHtml = '';
             if (loc.category !== 'office') {
                 const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
                 popupLinksHtml = `
-                    <div class="flex gap-2 border-t border-gray-100 pt-2.5 mt-2.5">
-                        ${loc.url ? `<a href="${loc.url}" target="_blank" style="color: #ffffff !important;" class="flex-grow text-center bg-[#5877e9] hover:bg-[#4663cf] text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all border border-[#5877e9]/20 block">🌐 Website</a>` : ''}
-                        <a href="${directionsUrl}" target="_blank" style="color: #ffffff !important;" class="flex-grow text-center bg-[#000749] hover:bg-[#5877e9] text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all border border-[#000749]/20 block">🚶‍♂️ Directions</a>
+                    <div class="flex gap-2 border-t border-gray-100 dark:border-slate-700 pt-3 mt-1.5">
+                        ${loc.url ? `<a href="${loc.url}" target="_blank" class="flex-1 text-center bg-[#5877e9] hover:bg-[#4663cf] text-white text-[11px] font-bold py-2 px-2 rounded-md transition-colors border border-[#5877e9]/20 block shadow-sm">🌐 Website</a>` : ''}
+                        <a href="${directionsUrl}" target="_blank" class="flex-1 text-center bg-[#000749] dark:bg-slate-700 hover:bg-[#5877e9] dark:hover:bg-slate-600 text-white text-[11px] font-bold py-2 px-2 rounded-md transition-colors border border-[#000749]/20 dark:border-slate-600 block shadow-sm">🚶‍♂️ Directions</a>
                     </div>
                 `;
             }
 
-            // Bind Popup
+            // Bind Popup HTML - Passed className 'custom-popup' so Tailwind overrides correctly target Leaflet's generated structure
             const popupContent = `
-                <div class="custom-popup">
-                    <div class="popup-header ${config.bg}">
+                <div>
+                    <div class="px-3.5 py-3 text-white font-bold text-sm flex items-center gap-1.5 ${config.bg}">
                         ${config.icon} ${loc.name}
                     </div>
                     ${popupBuzzStrip}
-                    <div class="popup-body">
-                        <p class="font-bold text-xs text-gray-500 uppercase tracking-wide mb-1">${config.label} • ${loc.time} walk</p>
-                        <p class="text-gray-700 leading-relaxed">${loc.desc}</p>
+                    <div class="p-4">
+                        <p class="font-bold text-[11px] text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 transition-colors">${config.label} • ${loc.time} walk</p>
+                        <p class="text-gray-900 dark:text-gray-100 font-medium text-[13px] leading-relaxed mb-3 transition-colors">${loc.desc}</p>
                         ${popupLinksHtml}
                     </div>
                 </div>
             `;
-            marker.bindPopup(popupContent);
+            marker.bindPopup(popupContent, { className: 'custom-popup' });
             markers[loc.id] = marker;
         });
 
@@ -828,12 +980,12 @@
 
         // Open Office popup on startup
         setTimeout(() => {
-            if (markers['mediahub']) {
+            if (markers['mediahub'] && window.innerWidth >= 768) {
                 markers['mediahub'].addTo(map).openPopup();
             }
         }, 500);
 
-        // Sidebar Category Filters (Updated with Shop styles)
+        // Sidebar Category Filters
         function filterSpots(category) {
             const filterBtns = ['all', 'buzz', 'quick', 'sitdown', 'market', 'shop'];
             filterBtns.forEach(btn => {
@@ -842,17 +994,17 @@
                     if (category === 'buzz') {
                         el.className = "py-1.5 text-xs font-bold rounded bg-amber-500 text-white shadow-sm transition-all text-center";
                     } else if (category === 'shop') {
-                        el.className = "py-1.5 text-xs font-bold rounded bg-[#334155] text-white shadow-sm transition-all text-center";
+                        el.className = "py-1.5 text-xs font-bold rounded bg-slate-700 dark:bg-slate-300 text-white dark:text-slate-900 shadow-sm transition-all text-center";
                     } else {
-                        el.className = "py-1.5 text-xs font-bold rounded bg-[#000749] text-white shadow-sm transition-all text-center";
+                        el.className = "py-1.5 text-xs font-bold rounded bg-[#000749] dark:bg-[#5877e9] text-white shadow-sm transition-all text-center";
                     }
                 } else {
                     if (btn === 'buzz') {
-                        el.className = "py-1.5 text-xs font-semibold rounded text-amber-600 hover:bg-amber-100 transition-all text-center";
+                        el.className = "py-1.5 text-xs font-semibold rounded text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600 transition-all text-center";
                     } else if (btn === 'shop') {
-                        el.className = "py-1.5 text-xs font-semibold rounded text-[#334155] hover:bg-slate-100 transition-all text-center";
+                        el.className = "py-1.5 text-xs font-semibold rounded text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all text-center";
                     } else {
-                        el.className = "py-1.5 text-xs font-semibold rounded text-gray-600 hover:text-gray-900 transition-all text-center";
+                        el.className = "py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center";
                     }
                 }
             });
@@ -861,6 +1013,7 @@
 
         // Ensure Leaflet calculates container size and aligns markers with absolute precision once DOM is settled
         window.addEventListener('load', () => {
+            switchMobileTab(currentTab);
             setTimeout(() => {
                 map.invalidateSize(true);
             }, 300);
