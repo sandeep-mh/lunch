@@ -72,6 +72,7 @@
         .header-sitdown { background-color: #F59E0B; }
         .header-market { background-color: #EF4444; }
         .header-shop { background-color: #334155; }
+        .header-coffee { background-color: #8B4513; }
 
         /* Custom marker pin container reset to prevent Leaflet defaults from shifting coordinates */
         .custom-marker-pin {
@@ -127,19 +128,22 @@
                 </div>
             </div>
 
-            <!-- Filter Bar with 🐝 Buzz Offers and Shops -->
+            <!-- Filter Bar with Extended 4x2 Grid Options -->
             <div class="p-4 bg-gray-50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700 shrink-0 transition-colors">
-                <div class="bg-gray-200/60 dark:bg-slate-700 p-1 rounded-lg grid grid-cols-3 gap-1 transition-colors">
-                    <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-xs font-bold rounded bg-white dark:bg-slate-800 text-gray-800 dark:text-white shadow-sm transition-all text-center">All</button>
-                    <button onclick="filterSpots('buzz')" id="filter-buzz" class="py-1.5 text-xs font-semibold rounded text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600 transition-all text-center">🐝 Buzz</button>
-                    <button onclick="filterSpots('quick')" id="filter-quick" class="py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center">Quick</button>
-                    <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center">Sit-Down</button>
-                    <button onclick="filterSpots('market')" id="filter-market" class="py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center">Markets</button>
-                    <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-xs font-semibold rounded text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all text-center">Shops</button>
+                <div class="bg-gray-200/60 dark:bg-slate-700 p-1 rounded-lg grid grid-cols-4 gap-1 transition-colors">
+                    <button onclick="filterSpots('all')" id="filter-all" class="py-1.5 text-[11px] font-bold rounded bg-white dark:bg-slate-800 text-gray-800 dark:text-white shadow-sm transition-all text-center flex items-center justify-center">All</button>
+                    <button onclick="filterSpots('buzz')" id="filter-buzz" class="py-1.5 text-[11px] font-semibold rounded text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600 transition-all text-center flex items-center justify-center">🐝 Buzz</button>
+                    <button onclick="filterSpots('quick')" id="filter-quick" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Quick Eats</button>
+                    <button onclick="filterSpots('coffee')" id="filter-coffee" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Coffee</button>
+                    
+                    <button onclick="filterSpots('sitdown')" id="filter-sitdown" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Sit-Down</button>
+                    <button onclick="filterSpots('market')" id="filter-market" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Markets</button>
+                    <button onclick="filterSpots('shop')" id="filter-shop" class="py-1.5 text-[11px] font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center flex items-center justify-center">Shops</button>
+                    <button onclick="surpriseMe()" id="filter-surprise" class="py-1.5 text-[11px] font-semibold rounded text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-slate-600 transition-all text-center flex items-center justify-center gap-1">🎲 Surprise</button>
                 </div>
                 <div class="flex justify-between items-center mt-3 px-1">
                     <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">LUNCH SPOTS</p>
-                    <span class="text-[10px] font-extrabold text-gray-500 dark:text-gray-400 bg-gray-200/50 dark:bg-slate-700/50 px-2 py-0.5 rounded-full"><span id="spots-count">42</span> / 42 spots</span>
+                    <span class="text-[10px] font-extrabold text-gray-500 dark:text-gray-400 bg-gray-200/50 dark:bg-slate-700/50 px-2 py-0.5 rounded-full"><span id="spots-count">0</span> spots</span>
                 </div>
             </div>
             
@@ -250,40 +254,33 @@
                     mapWrapper.classList.add('hidden');
                     mapWrapper.classList.remove('block');
                     
-                    // Style active tab
                     tabList.classList.add('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
-                    tabList.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                    tabList.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium');
                     tabMap.classList.remove('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
-                    tabMap.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                    tabMap.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium');
                 } else {
                     sidebar.classList.add('hidden');
                     sidebar.classList.remove('flex');
                     mapWrapper.classList.remove('hidden');
                     mapWrapper.classList.add('block');
                     
-                    // Style active tab
                     tabMap.classList.add('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
-                    tabMap.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                    tabMap.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium');
                     tabList.classList.remove('text-[#5877e9]', 'dark:text-[#8ba2ff]', 'font-bold');
-                    tabList.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium', 'hover:text-gray-600', 'dark:hover:text-gray-300');
+                    tabList.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium');
                     
-                    // Crucial: Leaflet needs to know the container size changed when un-hidden
                     setTimeout(() => { map.invalidateSize(true); }, 50);
                 }
             } else {
-                // On desktop, both panels are always visible
                 sidebar.classList.remove('hidden');
                 sidebar.classList.add('flex');
                 mapWrapper.classList.remove('hidden');
                 mapWrapper.classList.add('block');
             }
         }
-
-        // Re-evaluate layout automatically if user rotates device or resizes window
         window.addEventListener('resize', () => switchMobileTab(currentTab));
 
-
-        // Leaflet / Map Initialization & Predefined Locations (42 Curated Audited Spots + Office)
+        // Leaflet / Map Initialization & Location Database
         const locations = [
             {
                 id: 'mediahub',
@@ -307,20 +304,20 @@
                 url: 'https://www.drakeandmorgan.co.uk/the-refinery-bankside/'
             },
             {
-                id: 'leonsouthwark',
-                name: 'LEON Borough Market',
-                category: 'sitdown',
-                lat: 51.505215,
-                lng: -0.089776,
-                desc: 'Excellent healthy fast food box-meals, wraps, and specialty baked fries, located at Borough Market.',
-                time: '8 mins',
+                id: 'leonbankside',
+                name: 'LEON Bankside',
+                category: 'quick',
+                lat: 51.506336,
+                lng: -0.099361,
+                desc: 'Excellent healthy fast food box-meals, wraps, and specialty baked fries. Located at 7 Canvey St London SE1 9AN.',
+                time: '2 mins',
                 buzzOffer: '15% discount on food (excludes delivery platforms)',
-                url: 'https://leon.co/restaurants/borough/'
+                url: 'https://leon.co/restaurants/'
             },
             {
                 id: 'blacksheep',
                 name: 'Black Sheep Coffee',
-                category: 'quick',
+                category: 'coffee',
                 lat: 51.505410,
                 lng: -0.099509,
                 desc: 'Specialty coffee, signature waffles, and premium toasted sandwiches located right next to the office.',
@@ -475,7 +472,7 @@
             {
                 id: 'gentlemenbaristas',
                 name: 'The Gentlemen Baristas',
-                category: 'sitdown',
+                category: 'coffee',
                 lat: 51.505214,
                 lng: -0.091858,
                 desc: 'Outstanding locally-sourced specialty coffee shop, delicious fresh toasties, and robust house bakes.',
@@ -486,7 +483,7 @@
             {
                 id: 'origin',
                 name: 'Origin Coffee Roasters',
-                category: 'quick',
+                category: 'coffee',
                 lat: 51.504292,
                 lng: -0.103575,
                 desc: 'Specialty coffee roasters serving an expansive breakfast & lunch menu under the railway arches.',
@@ -536,7 +533,6 @@
                 time: '7 mins',
                 url: 'https://boroughmarket.org.uk/'
             },
-            // --- NEW LOCATIONS INCORPORATED FROM CSV ---
             {
                 id: 'breakfastclub',
                 name: 'The Breakfast Club London Bridge',
@@ -610,7 +606,7 @@
             {
                 id: 'nagare',
                 name: 'Nagare Bankside',
-                category: 'quick',
+                category: 'coffee',
                 lat: 51.507067,
                 lng: -0.097271,
                 desc: 'Exquisite Japanese bakery / cafe serving artisan drinks and sweet pastries at 2 Triptych Pl, SE1 9RD.',
@@ -620,7 +616,7 @@
             {
                 id: 'chealsons',
                 name: 'Chealsons Coffee Bankside',
-                category: 'quick',
+                category: 'coffee',
                 lat: 51.508530,
                 lng: -0.100048,
                 desc: 'Independent specialty coffee / light bites located on the scenic Bankside walk, SE1 9JH.',
@@ -726,16 +722,160 @@
                 desc: 'Artisanal bakery and specialty coffee spot serving legendary sourdough bread, sweet morning pastries, and fresh lunch rolls. Located at Unit C, 70 Holland St, London SE1 9NX.',
                 time: '2 mins',
                 url: 'https://gailsbread.co.uk/'
+            },
+            // --- NEW BUZZ CARD DINING OFFERS ADDITIONS ---
+            {
+                id: 'angrycrabshack',
+                name: 'Angry Crab Shack',
+                category: 'sitdown',
+                lat: 51.506989,
+                lng: -0.092692,
+                desc: 'Located at Arch 230, Borough Yards, Bank End, London SE1 9FJ.',
+                time: '6 mins',
+                buzzOffer: '10% off all menu items',
+                url: ''
+            },
+            {
+                id: 'bancone',
+                name: 'Bancone',
+                category: 'sitdown',
+                lat: 51.506550,
+                lng: -0.091462,
+                desc: 'Located at Arch 213, 18 Stoney St, London SE1 9AD.',
+                time: '7 mins',
+                buzzOffer: '20% off food',
+                url: ''
+            },
+            {
+                id: 'bardouro',
+                name: 'Bar Douro',
+                category: 'sitdown',
+                lat: 51.504395,
+                lng: -0.095382,
+                desc: 'Located at Arch 35B, 85B Southwark Bridge Rd, London SE1 0NQ.',
+                time: '4 mins',
+                buzzOffer: '10% off total bill',
+                url: ''
+            },
+            {
+                id: 'birdandblend',
+                name: 'Bird and Blend Tea Co',
+                category: 'coffee',
+                lat: 51.505270,
+                lng: -0.091624,
+                desc: 'Located at 7 Park St, London SE1 9AB.',
+                time: '7 mins',
+                buzzOffer: '10% off for Buzz Card members',
+                url: ''
+            },
+            {
+                id: 'birdshillcoffee',
+                name: 'Birds Hill Coffee',
+                category: 'coffee',
+                lat: 51.506451,
+                lng: -0.102196,
+                desc: 'Located at 142 Southwark St, London SE1 0SW.',
+                time: '3 mins',
+                buzzOffer: '10% off any hot drink; toastie and crisps lunch deal',
+                url: ''
+            },
+            {
+                id: 'brothermarcus',
+                name: 'Brother Marcus',
+                category: 'sitdown',
+                lat: 51.505622,
+                lng: -0.092228,
+                desc: 'Located at 1 Dirty Ln, London SE1 9PA.',
+                time: '6 mins',
+                buzzOffer: '20% off brunch food Monday - Friday',
+                url: ''
+            },
+            {
+                id: 'roast',
+                name: 'Roast',
+                category: 'sitdown',
+                lat: 51.505631,
+                lng: -0.091052,
+                desc: 'Located at The Floral Hall, Stoney St, London SE1 1TL.',
+                time: '7 mins',
+                buzzOffer: '50% off food',
+                url: ''
+            },
+            {
+                id: 'seacontainers',
+                name: 'Sea Containers London',
+                category: 'sitdown',
+                lat: 51.508229,
+                lng: -0.106681,
+                desc: 'Located at 20 Upper Ground, London SE1 9PD.',
+                time: '10 mins',
+                buzzOffer: '10% off best available room rate',
+                url: ''
+            },
+            {
+                id: 'swiftbar',
+                name: 'Swift Bar',
+                category: 'sitdown',
+                lat: 51.503943,
+                lng: -0.091264,
+                desc: 'Located at 66 Borough High St, London SE1 1XF.',
+                time: '7 mins',
+                buzzOffer: '25% off all night every Monday',
+                url: ''
+            },
+            {
+                id: 'bluemaid',
+                name: 'The Blue Maid',
+                category: 'sitdown',
+                lat: 51.502630,
+                lng: -0.091973,
+                desc: 'Located at 173 Borough High St, London SE1 1HR.',
+                time: '9 mins',
+                buzzOffer: '10% off drinks and bar snacks',
+                url: ''
+            },
+            {
+                id: 'boroughmarketstore',
+                name: 'The Borough Market Store',
+                category: 'shop',
+                lat: 51.505246,
+                lng: -0.089963,
+                desc: 'Located at 8 Southwark St, London SE1 1TL.',
+                time: '8 mins',
+                buzzOffer: '20% discount',
+                url: ''
+            },
+            {
+                id: 'therealgreek',
+                name: 'The Real Greek',
+                category: 'sitdown',
+                lat: 51.508119,
+                lng: -0.095450,
+                desc: 'Located at Units 1&2, Riverside House, 2A Southwark Bridge Rd, London SE1 9HA.',
+                time: '5 mins',
+                buzzOffer: '20% off main menu food',
+                url: ''
+            },
+            {
+                id: 'monmouthcoffee',
+                name: 'Monmouth Coffee',
+                category: 'coffee',
+                lat: 51.505541,
+                lng: -0.091532,
+                desc: 'Located at 2 Park St, London SE1 9AB.',
+                time: '7 mins',
+                url: ''
             }
         ];
 
         // Configuration mapping
         const catConfig = {
-            'office': { textColor: 'text-[#000749]', bg: 'header-office', label: 'Your Office', icon: '🏢' },
-            'quick': { textColor: 'text-[#10B981]', bg: 'header-quick', label: 'Quick / Desk Eats', icon: '🥗' },
-            'sitdown': { textColor: 'text-[#F59E0B]', bg: 'header-sitdown', label: 'Sit-Down / Meetings', icon: '🍽️' },
-            'market': { textColor: 'text-[#EF4444]', bg: 'header-market', label: 'Markets / Hubs', icon: '🎪' },
-            'shop': { textColor: 'text-[#334155]', bg: 'header-shop', label: 'Shops / Supermarkets', icon: '🏪' }
+            'office': { textColor: 'text-[#000749] dark:text-[#5877e9]', bg: 'header-office', label: 'Your Office', icon: '🏢' },
+            'quick': { textColor: 'text-[#10B981] dark:text-emerald-400', bg: 'header-quick', label: 'Quick / Desk Eats', icon: '🥗' },
+            'sitdown': { textColor: 'text-[#F59E0B] dark:text-amber-400', bg: 'header-sitdown', label: 'Sit-Down / Meetings', icon: '🍽️' },
+            'market': { textColor: 'text-[#EF4444] dark:text-red-400', bg: 'header-market', label: 'Markets / Hubs', icon: '🎪' },
+            'shop': { textColor: 'text-[#334155] dark:text-slate-400', bg: 'header-shop', label: 'Shops / Supermarkets', icon: '🏪' },
+            'coffee': { textColor: 'text-[#8B4513] dark:text-amber-600', bg: 'header-coffee', label: 'Coffee / Tea', icon: '☕' }
         };
 
         const map = L.map('map', {
@@ -755,14 +895,13 @@
         // --- Walking Time Concentric Circles Setup ---
         const officeCoords = [51.505615, -0.098869];
         const ringData = [
-            { limit: '3 min', radius: 250, color: '#06B6D4', desc: '3 Mins walking radius (~250m)' },   // Cyan
-            { limit: '5 min', radius: 415, color: '#F59E0B', desc: '5 Mins walking radius (~415m)' },   // Amber
-            { limit: '10 min', radius: 830, color: '#EF4444', desc: '10 Mins walking radius (~830m)' }  // Red
+            { limit: '3 min', radius: 250, color: '#06B6D4', desc: '3 Mins walking radius (~250m)' },
+            { limit: '5 min', radius: 415, color: '#F59E0B', desc: '5 Mins walking radius (~415m)' },
+            { limit: '10 min', radius: 830, color: '#EF4444', desc: '10 Mins walking radius (~830m)' }
         ];
 
         const ringGroup = L.layerGroup().addTo(map);
 
-        // Add rings from outer (10 mins) to inner (3 mins) to keep smaller elements hoverable
         ringData.slice().reverse().forEach(ring => {
             L.circle(officeCoords, {
                 radius: ring.radius,
@@ -777,7 +916,6 @@
             .addTo(ringGroup);
         });
 
-        // Toggle rings layer group visibility & collapse legend body dynamically
         function toggleRings(visible) {
             const legendBody = document.getElementById('legend-body');
             const legendHeader = document.getElementById('legend-header');
@@ -794,6 +932,71 @@
 
         const markers = {};
 
+        // Extracted reusable DOM-generation logic to handle both mass list rendering and the single "Surprise Me" render
+        function createListItem(loc, container) {
+            const config = catConfig[loc.category];
+            const listItem = document.createElement('div');
+            
+            listItem.className = 'p-3.5 rounded-lg border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-[#5877e9]/30 dark:hover:border-[#5877e9]/50 hover:shadow-md transition-all cursor-pointer group';
+            
+            let highlightClass = loc.category === 'office' ? 'text-[#000749] dark:text-[#5877e9]' : 'text-gray-800 dark:text-gray-100 group-hover:text-[#5877e9] dark:group-hover:text-[#8ba2ff]';
+
+            let buzzBadgeHtml = '';
+            if (loc.buzzOffer) {
+                buzzBadgeHtml = `
+                    <div class="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-700/50 w-fit transition-colors">
+                        🐝 Buzz Card: ${loc.buzzOffer}
+                    </div>
+                `;
+            }
+
+            let listLinksHtml = '';
+            if (loc.category !== 'office') {
+                const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
+                listLinksHtml = `
+                    <div class="mt-3 flex gap-2" onclick="event.stopPropagation();">
+                        ${loc.url ? `<a href="${loc.url}" target="_blank" class="flex-1 text-center bg-[#5877e9]/10 dark:bg-[#5877e9]/20 hover:bg-[#5877e9] dark:hover:bg-[#5877e9] text-[#5877e9] dark:text-[#8ba2ff] hover:text-white dark:hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#5877e9]/20 dark:border-[#5877e9]/30 shadow-sm">🌐 Website</a>` : ''}
+                        <a href="${directionsUrl}" target="_blank" class="flex-1 text-center bg-[#000749]/10 dark:bg-slate-700 hover:bg-[#000749] dark:hover:bg-slate-600 text-[#000749] dark:text-gray-200 hover:text-white dark:hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#000749]/20 dark:border-slate-600 shadow-sm">🚶‍♂️ Directions</a>
+                    </div>
+                `;
+            }
+
+            // Map color classes strictly correctly
+            let catColorClass = 'text-red-500 dark:text-red-400';
+            if (loc.category === 'office') catColorClass = 'text-[#000749] dark:text-[#5877e9]';
+            else if (loc.category === 'quick') catColorClass = 'text-emerald-500 dark:text-emerald-400';
+            else if (loc.category === 'sitdown') catColorClass = 'text-amber-500 dark:text-amber-400';
+            else if (loc.category === 'shop') catColorClass = 'text-slate-600 dark:text-slate-400';
+            else if (loc.category === 'coffee') catColorClass = 'text-[#8B4513] dark:text-amber-600';
+
+            listItem.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <h3 class="font-extrabold text-sm ${highlightClass} flex items-center gap-1.5 tracking-tight transition-colors">
+                        ${config.icon} ${loc.name}
+                    </h3>
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-full whitespace-nowrap transition-colors">
+                        ${loc.time}
+                    </span>
+                </div>
+                <p class="text-xs font-medium text-gray-800 dark:text-gray-200 mt-1.5 leading-relaxed transition-colors">${loc.desc}</p>
+                ${buzzBadgeHtml}
+                ${listLinksHtml}
+                <div class="mt-2.5 text-[10px] font-bold tracking-wider uppercase ${catColorClass} transition-colors">
+                    ${config.label}
+                </div>
+            `;
+
+            listItem.addEventListener('click', () => {
+                if (window.innerWidth < 768 && currentTab !== 'map') {
+                    switchMobileTab('map');
+                }
+                map.setView([loc.lat, loc.lng], 18, { animate: true, duration: 1 });
+                if (markers[loc.id]) markers[loc.id].openPopup();
+            });
+
+            container.appendChild(listItem);
+        }
+
         // Render standard spots list
         function renderSpotsList(filterCategory = 'all') {
             const listContainer = document.getElementById('location-list');
@@ -802,8 +1005,7 @@
             let count = 0;
 
             locations.forEach(loc => {
-                // Apply category filtering
-                if (filterCategory !== 'all') {
+                if (filterCategory !== 'all' && filterCategory !== 'surprise') {
                     if (filterCategory === 'buzz') {
                         if (!loc.buzzOffer && loc.category !== 'office') {
                             if (markers[loc.id]) map.removeLayer(markers[loc.id]);
@@ -815,94 +1017,28 @@
                     }
                 }
                 
-                // Show corresponding marker on map
                 if (markers[loc.id]) markers[loc.id].addTo(map);
 
-                if (loc.category !== 'office') {
-                    count++;
-                }
-                const config = catConfig[loc.category];
-
-                const listItem = document.createElement('div');
-                // Added extensive dark mode UI classes
-                listItem.className = 'p-3.5 rounded-lg border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-[#5877e9]/30 dark:hover:border-[#5877e9]/50 hover:shadow-md transition-all cursor-pointer group';
+                if (loc.category !== 'office') count++;
                 
-                let highlightClass = loc.category === 'office' ? 'text-[#000749] dark:text-[#5877e9]' : 'text-gray-800 dark:text-gray-100 group-hover:text-[#5877e9] dark:group-hover:text-[#8ba2ff]';
-
-                // Render dynamic Buzz badge if offer exists
-                let buzzBadgeHtml = '';
-                if (loc.buzzOffer) {
-                    buzzBadgeHtml = `
-                        <div class="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-700/50 w-fit transition-colors">
-                            🐝 Buzz Card: ${loc.buzzOffer}
-                        </div>
-                    `;
-                }
-
-                // Add action links for the list item (updated styles for dark mode legibility)
-                let listLinksHtml = '';
-                if (loc.category !== 'office') {
-                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
-                    listLinksHtml = `
-                        <div class="mt-3 flex gap-2" onclick="event.stopPropagation();">
-                            ${loc.url ? `<a href="${loc.url}" target="_blank" class="flex-1 text-center bg-[#5877e9]/10 dark:bg-[#5877e9]/20 hover:bg-[#5877e9] dark:hover:bg-[#5877e9] text-[#5877e9] dark:text-[#8ba2ff] hover:text-white dark:hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#5877e9]/20 dark:border-[#5877e9]/30 shadow-sm">🌐 Website</a>` : ''}
-                            <a href="${directionsUrl}" target="_blank" class="flex-1 text-center bg-[#000749]/10 dark:bg-slate-700 hover:bg-[#000749] dark:hover:bg-slate-600 text-[#000749] dark:text-gray-200 hover:text-white dark:hover:text-white text-xs font-bold py-1.5 px-2.5 rounded transition-all border border-[#000749]/20 dark:border-slate-600 shadow-sm">🚶‍♂️ Directions</a>
-                        </div>
-                    `;
-                }
-
-                listItem.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-extrabold text-sm ${highlightClass} flex items-center gap-1.5 tracking-tight transition-colors">
-                            ${config.icon} ${loc.name}
-                        </h3>
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-full whitespace-nowrap transition-colors">
-                            ${loc.time}
-                        </span>
-                    </div>
-                    <p class="text-xs font-medium text-gray-800 dark:text-gray-200 mt-1.5 leading-relaxed transition-colors">${loc.desc}</p>
-                    ${buzzBadgeHtml}
-                    ${listLinksHtml}
-                    <div class="mt-2.5 text-[10px] font-bold tracking-wider uppercase ${
-                        loc.category === 'office' ? 'text-[#000749] dark:text-[#5877e9]' :
-                        loc.category === 'quick' ? 'text-emerald-500 dark:text-emerald-400' : 
-                        loc.category === 'sitdown' ? 'text-amber-500 dark:text-amber-400' : 
-                        loc.category === 'shop' ? 'text-slate-600 dark:text-slate-400' : 'text-red-500 dark:text-red-400'
-                    } transition-colors">
-                        ${config.label}
-                    </div>
-                `;
-
-                listItem.addEventListener('click', () => {
-                    // Automatically jump to the map view if tapped on mobile
-                    if (window.innerWidth < 768 && currentTab !== 'map') {
-                        switchMobileTab('map');
-                    }
-                    
-                    map.setView([loc.lat, loc.lng], 18, { animate: true, duration: 1 });
-                    if (markers[loc.id]) markers[loc.id].openPopup();
-                });
-
-                listContainer.appendChild(listItem);
+                createListItem(loc, listContainer);
             });
 
             document.getElementById('spots-count').innerText = count;
         }
 
-        // Initialize markers on map initially
+        // Initialize markers map data structures
         locations.forEach(loc => {
             const config = catConfig[loc.category];
 
             let iconHtml = '';
             let customIconOpts = {};
 
-            // --- DIFFERENTIATED HEADQUARTERS PIN ---
             if (loc.category === 'office') {
-                // Generates a larger, 40x56 custom pin with an internal star and a glowing drop shadow
                 iconHtml = `
                     <div class="relative group">
                         <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-[#000749]/40 dark:bg-[#5877e9]/40 rounded-full animate-ping blur-[1px]"></div>
-                        <svg class="text-[#000749] dark:text-[#5877e9] drop-shadow-xl relative z-10" width="40" height="56" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="${config.textColor} drop-shadow-xl relative z-10" width="40" height="56" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0Z" fill="currentColor"/>
                             <path d="M15 5.5L17.5 11.5L24 12.5L19 17L20.5 23.5L15 20.5L9.5 23.5L11 17L6 12.5L12.5 11.5L15 5.5Z" fill="#FFFFFF"/>
                         </svg>
@@ -916,7 +1052,6 @@
                     popupAnchor: [0, -56]
                 };
             } else {
-                // --- STANDARD LOCATION PINS ---
                 iconHtml = `
                     <svg class="${config.textColor} drop-shadow-md transition-colors" width="30" height="42" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0ZM15 21C11.6863 21 9 18.3137 9 15C9 11.6863 11.6863 9 15 9C18.3137 9 21 11.6863 21 15C21 18.3137 18.3137 21 15 21Z" fill="currentColor"/>
@@ -935,7 +1070,6 @@
             const customIcon = L.divIcon(customIconOpts);
             const marker = L.marker([loc.lat, loc.lng], { icon: customIcon });
             
-            // Render Buzz alert in marker popups
             let popupBuzzStrip = '';
             if (loc.buzzOffer) {
                 popupBuzzStrip = `
@@ -945,7 +1079,6 @@
                 `;
             }
 
-            // Build links for Website and Google Maps walking directions inside popups
             let popupLinksHtml = '';
             if (loc.category !== 'office') {
                 const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Omnicom Media Group, 90, 100 Southwark St, London SE1 0SW')}&destination=${encodeURIComponent(loc.name + ', London')}&travelmode=walking`;
@@ -957,7 +1090,6 @@
                 `;
             }
 
-            // Bind Popup HTML - Passed className 'custom-popup' so Tailwind overrides correctly target Leaflet's generated structure
             const popupContent = `
                 <div>
                     <div class="px-3.5 py-3 text-white font-bold text-sm flex items-center gap-1.5 ${config.bg}">
@@ -978,45 +1110,89 @@
         // Initial Render
         renderSpotsList('all');
 
-        // Open Office popup on startup
         setTimeout(() => {
             if (markers['mediahub'] && window.innerWidth >= 768) {
                 markers['mediahub'].addTo(map).openPopup();
             }
         }, 500);
 
-        // Sidebar Category Filters
-        function filterSpots(category) {
-            const filterBtns = ['all', 'buzz', 'quick', 'sitdown', 'market', 'shop'];
+        // Interactive Surprise Me Logic
+        function surpriseMe() {
+            // Re-style UI specific to Surprise button
+            filterSpots('surprise', true);
+            
+            const validLocations = locations.filter(loc => loc.category !== 'office');
+            const randomLoc = validLocations[Math.floor(Math.random() * validLocations.length)];
+
+            // Clear all non-office markers
+            locations.forEach(loc => {
+                if (markers[loc.id]) map.removeLayer(markers[loc.id]);
+            });
+
+            // Isolate map rendering
+            if (markers['mediahub']) markers['mediahub'].addTo(map);
+            if (markers[randomLoc.id]) {
+                markers[randomLoc.id].addTo(map);
+                map.setView([randomLoc.lat, randomLoc.lng], 18, { animate: true, duration: 1 });
+                markers[randomLoc.id].openPopup();
+            }
+
+            // Isolate list rendering
+            const listContainer = document.getElementById('location-list');
+            listContainer.innerHTML = '';
+            createListItem(randomLoc, listContainer);
+
+            document.getElementById('spots-count').innerText = "1";
+
+            // Flip automatically to Map layout natively on mobile 
+            if (window.innerWidth < 768 && currentTab !== 'map') {
+                switchMobileTab('map');
+            }
+        }
+
+        // Sidebar Category Central Filter Routing
+        function filterSpots(category, skipRender = false) {
+            const filterBtns = ['all', 'buzz', 'quick', 'coffee', 'sitdown', 'market', 'shop', 'surprise'];
+            
             filterBtns.forEach(btn => {
                 const el = document.getElementById('filter-' + btn);
+                if (!el) return;
+                
+                // Base classes required for the 4x2 unified grid appearance
+                let baseClass = "py-1.5 text-[11px] rounded transition-all text-center flex items-center justify-center h-full ";
+                
                 if (btn === category) {
                     if (category === 'buzz') {
-                        el.className = "py-1.5 text-xs font-bold rounded bg-amber-500 text-white shadow-sm transition-all text-center";
+                        el.className = baseClass + "font-bold bg-amber-500 text-white shadow-sm";
                     } else if (category === 'shop') {
-                        el.className = "py-1.5 text-xs font-bold rounded bg-slate-700 dark:bg-slate-300 text-white dark:text-slate-900 shadow-sm transition-all text-center";
+                        el.className = baseClass + "font-bold bg-slate-700 dark:bg-slate-300 text-white dark:text-slate-900 shadow-sm";
+                    } else if (category === 'coffee') {
+                        el.className = baseClass + "font-bold bg-[#8B4513] text-white shadow-sm";
+                    } else if (category === 'surprise') {
+                        el.className = baseClass + "font-bold bg-purple-600 text-white shadow-sm gap-1";
                     } else {
-                        el.className = "py-1.5 text-xs font-bold rounded bg-[#000749] dark:bg-[#5877e9] text-white shadow-sm transition-all text-center";
+                        el.className = baseClass + "font-bold bg-[#000749] dark:bg-[#5877e9] text-white shadow-sm";
                     }
                 } else {
                     if (btn === 'buzz') {
-                        el.className = "py-1.5 text-xs font-semibold rounded text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600 transition-all text-center";
-                    } else if (btn === 'shop') {
-                        el.className = "py-1.5 text-xs font-semibold rounded text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all text-center";
+                        el.className = baseClass + "font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-slate-600";
+                    } else if (btn === 'surprise') {
+                        el.className = baseClass + "font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-slate-600 gap-1";
                     } else {
-                        el.className = "py-1.5 text-xs font-semibold rounded text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all text-center";
+                        el.className = baseClass + "font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-200/50 dark:hover:bg-slate-600";
                     }
                 }
             });
-            renderSpotsList(category);
+
+            if (!skipRender && category !== 'surprise') {
+                renderSpotsList(category);
+            }
         }
 
-        // Ensure Leaflet calculates container size and aligns markers with absolute precision once DOM is settled
+        // Initialize Map Sizing
         window.addEventListener('load', () => {
             switchMobileTab(currentTab);
-            setTimeout(() => {
-                map.invalidateSize(true);
-            }, 300);
+            setTimeout(() => { map.invalidateSize(true); }, 300);
         });
     </script>
 </body>
