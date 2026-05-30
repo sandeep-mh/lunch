@@ -98,6 +98,33 @@
             /* Sleek inversion matrix for dark mode map tiles */
             filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
         }
+
+        /* --- Dynamic Pin Scaling --- */
+        :root {
+            --pin-scale: 1;
+        }
+        
+        .pin-scaler {
+            transform: scale(var(--pin-scale));
+            transform-origin: bottom center;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Dynamically adjust popup bottom margin to hug the scaled down pins */
+        .leaflet-popup {
+            margin-bottom: calc(42px * (var(--pin-scale) - 1)) !important;
+            transition: margin-bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* HQ pin is taller (56px) so it needs a slightly larger gap correction */
+        .hq-popup.leaflet-popup {
+            margin-bottom: calc(56px * (var(--pin-scale) - 1)) !important;
+        }
     </style>
 </head>
 <body class="flex flex-col h-[100dvh] bg-gray-50 dark:bg-slate-900 transition-colors duration-200">
@@ -867,6 +894,31 @@
             }
         ];
 
+        // --- Distance Calculation & Auto-Sorting ---
+        const officeLat = 51.505615;
+        const officeLng = -0.098869;
+
+        // Haversine formula to calculate true geographic distance between two points
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            return R * c; 
+        }
+
+        // Sort the master array by distance immediately (keeping Office pinned to the top)
+        locations.sort((a, b) => {
+            if (a.category === 'office') return -1;
+            if (b.category === 'office') return 1;
+            const distA = calculateDistance(officeLat, officeLng, a.lat, a.lng);
+            const distB = calculateDistance(officeLat, officeLng, b.lat, b.lng);
+            return distA - distB;
+        });
+
         // Configuration mapping
         const catConfig = {
             'office': { textColor: 'text-[#000749] dark:text-[#5877e9]', bg: 'header-office', label: 'Your Office', icon: '🏢' },
@@ -879,7 +931,7 @@
 
         const map = L.map('map', {
             zoomControl: false
-        }).setView([51.505615, -0.098869], 16);
+        }).setView([officeLat, officeLng], 16);
 
         L.control.zoom({
             position: 'bottomright'
@@ -892,7 +944,6 @@
         }).addTo(map);
 
         // --- Walking Time Concentric Circles Setup ---
-        const officeCoords = [51.505615, -0.098869];
         const ringData = [
             { limit: '3 min', radius: 250, color: '#38bdf8', desc: '3 Mins walking radius (~250m)' },   // Sky Blue
             { limit: '5 min', radius: 415, color: '#8b5cf6', desc: '5 Mins walking radius (~415m)' },   // Violet
@@ -902,7 +953,7 @@
         const ringGroup = L.layerGroup().addTo(map);
 
         ringData.slice().reverse().forEach(ring => {
-            L.circle(officeCoords, {
+            L.circle([officeLat, officeLng], {
                 radius: ring.radius,
                 color: ring.color,
                 weight: 1.5,
@@ -1035,7 +1086,7 @@
 
             if (loc.category === 'office') {
                 iconHtml = `
-                    <div class="relative group">
+                    <div class="pin-scaler relative group w-full h-full">
                         <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-[#000749]/40 dark:bg-[#5877e9]/40 rounded-full animate-ping blur-[1px]"></div>
                         <svg class="${config.textColor} drop-shadow-xl relative z-10" width="40" height="56" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0Z" fill="currentColor"/>
@@ -1052,10 +1103,12 @@
                 };
             } else {
                 iconHtml = `
-                    <svg class="${config.textColor} drop-shadow-md transition-colors" width="30" height="42" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0ZM15 21C11.6863 21 9 18.3137 9 15C9 11.6863 11.6863 9 15 9C18.3137 9 21 11.6863 21 15C21 18.3137 18.3137 21 15 21Z" fill="currentColor"/>
-                        <circle cx="15" cy="15" r="5" fill="#FFFFFF"/>
-                    </svg>
+                    <div class="pin-scaler w-full h-full">
+                        <svg class="${config.textColor} drop-shadow-md transition-colors" width="30" height="42" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0ZM15 21C11.6863 21 9 18.3137 9 15C9 11.6863 11.6863 9 15 9C18.3137 9 21 11.6863 21 15C21 18.3137 18.3137 21 15 21Z" fill="currentColor"/>
+                            <circle cx="15" cy="15" r="5" fill="#FFFFFF"/>
+                        </svg>
+                    </div>
                 `;
                 customIconOpts = {
                     html: iconHtml,
@@ -1102,9 +1155,25 @@
                     </div>
                 </div>
             `;
-            marker.bindPopup(popupContent, { className: 'custom-popup' });
+            marker.bindPopup(popupContent, { className: 'custom-popup' + (loc.category === 'office' ? ' hq-popup' : '') });
             markers[loc.id] = marker;
         });
+
+        // Dynamic Pin Scaling based on Zoom Level
+        function updateMapScale() {
+            const zoom = map.getZoom();
+            let scale = 1;
+            
+            if (zoom <= 13) scale = 0.5;
+            else if (zoom === 14) scale = 0.65;
+            else if (zoom === 15) scale = 0.85;
+            else scale = 1;
+
+            document.documentElement.style.setProperty('--pin-scale', scale);
+        }
+
+        map.on('zoomend', updateMapScale);
+        updateMapScale(); // Initialize
 
         // Initial Render
         renderSpotsList('all');
@@ -1158,7 +1227,7 @@
         function filterSpots(category, skipRender = false) {
             // Reset map view to default if exiting Surprise mode
             if (isSurpriseMode && category !== 'surprise') {
-                map.setView([51.505615, -0.098869], 16, { animate: true, duration: 1 });
+                map.setView([officeLat, officeLng], 16, { animate: true, duration: 1 });
                 map.closePopup();
                 isSurpriseMode = false;
             }
